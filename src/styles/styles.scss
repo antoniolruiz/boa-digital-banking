@@ -1,0 +1,130 @@
+@use './variables' as vars;
+@use './meridian-theme';
+
+// Global Styles for BoA Digital Banking
+
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: vars.$boa-font-family;
+  font-size: vars.$boa-font-size-base;
+  color: vars.$boa-dark-gray;
+  background-color: vars.$boa-light-gray;
+}
+
+// Global Typography
+h1, h2, h3, h4, h5, h6 {
+  font-family: vars.$boa-font-family;
+  color: vars.$boa-navy;
+}
+
+h1 { font-size: vars.$boa-font-size-hero; font-weight: 300; }
+h2 { font-size: vars.$boa-font-size-xxl; font-weight: 400; }
+h3 { font-size: vars.$boa-font-size-xl; font-weight: 400; }
+h4 { font-size: vars.$boa-font-size-lg; font-weight: 500; }
+
+a {
+  color: vars.$boa-navy;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    color: darken(vars.$boa-navy, 10%);
+  }
+}
+
+// Utility Classes
+.boa-container {
+  max-width: vars.$boa-breakpoint-xl;
+  margin: 0 auto;
+  padding: 0 vars.$boa-spacing-md;
+}
+
+.boa-page-header {
+  padding: vars.$boa-spacing-lg 0;
+  border-bottom: 2px solid vars.$boa-navy;
+  margin-bottom: vars.$boa-spacing-lg;
+}
+
+.boa-card {
+  background: vars.$boa-white;
+  border-radius: vars.$boa-radius-md;
+  box-shadow: vars.$boa-shadow-sm;
+  padding: vars.$boa-spacing-lg;
+  margin-bottom: vars.$boa-spacing-md;
+}
+
+.boa-amount {
+  font-weight: 500;
+
+  &--positive {
+    color: vars.$boa-success;
+  }
+
+  &--negative {
+    color: vars.$boa-error;
+  }
+}
+
+.boa-badge {
+  display: inline-block;
+  padding: vars.$boa-spacing-xs vars.$boa-spacing-sm;
+  border-radius: vars.$boa-radius-pill;
+  font-size: vars.$boa-font-size-xs;
+  font-weight: 500;
+  text-transform: uppercase;
+
+  &--checking { background-color: lighten(vars.$boa-checking, 60%); color: vars.$boa-checking; }
+  &--savings { background-color: lighten(vars.$boa-savings, 50%); color: vars.$boa-savings; }
+  &--credit { background-color: lighten(vars.$boa-credit, 40%); color: vars.$boa-credit; }
+  &--investment { background-color: lighten(vars.$boa-investment, 50%); color: vars.$boa-investment; }
+}
+
+// Material Component Overrides
+.mat-drawer-container {
+  height: 100%;
+}
+
+.mat-sidenav {
+  width: 260px;
+  background-color: vars.$boa-white;
+  border-right: 1px solid vars.$boa-border-gray;
+}
+
+.mat-list-item.active {
+  background-color: lighten(vars.$boa-navy, 70%);
+  color: vars.$boa-navy;
+  font-weight: 500;
+}
+
+// Form Styles
+.boa-form-group {
+  margin-bottom: vars.$boa-spacing-md;
+}
+
+.mat-form-field {
+  width: 100%;
+}
+
+// Table Styles
+.boa-data-table {
+  width: 100%;
+
+  .mat-header-cell {
+    color: vars.$boa-navy;
+    font-weight: 600;
+    font-size: vars.$boa-font-size-sm;
+  }
+}
+
+// Alert Styles
+.boa-alert {
+  padding: vars.$boa-spacing-md;
+  border-radius: vars.$boa-radius-sm;
+  margin-bottom: vars.$boa-spacing-md;
+
+  &--info { background-color: lighten(vars.$boa-info, 45%); border-left: 4px solid vars.$boa-info; }
+  &--success { background-color: lighten(vars.$boa-success, 50%); border-left: 4px solid vars.$boa-success; }
+  &--warning { background-color: lighten(vars.$boa-warning, 40%); border-left: 4px solid vars.$boa-warning; }
+  &--error { background-color: lighten(vars.$boa-error, 40%); border-left: 4px solid vars.$boa-error; }
+}

@@ -1,0 +1,83 @@
+import { Account, AccountType, AccountStatus } from '../../app/shared/models/account.model';
+
+export const MOCK_ACCOUNTS: Account[] = [
+  {
+    id: 'acct-001',
+    accountNumber: '****4523',
+    routingNumber: '026009593',
+    accountType: AccountType.CHECKING,
+    accountName: 'BoA Advantage Plus Checking',
+    nickname: 'Primary Checking',
+    balance: 15234.67,
+    availableBalance: 14890.00,
+    currency: 'USD',
+    status: AccountStatus.ACTIVE,
+    lastActivityDate: '2024-01-15T10:30:00Z',
+    openedDate: '2018-03-22T00:00:00Z',
+    isPrimary: true
+  },
+  {
+    id: 'acct-002',
+    accountNumber: '****8891',
+    routingNumber: '026009593',
+    accountType: AccountType.SAVINGS,
+    accountName: 'BoA Advantage Savings',
+    nickname: 'Emergency Fund',
+    balance: 52180.33,
+    availableBalance: 52180.33,
+    currency: 'USD',
+    status: AccountStatus.ACTIVE,
+    lastActivityDate: '2024-01-14T08:00:00Z',
+    openedDate: '2018-03-22T00:00:00Z',
+    interestRate: 0.04,
+    isPrimary: false
+  },
+  {
+    id: 'acct-003',
+    accountNumber: '****2210',
+    routingNumber: '026009593',
+    accountType: AccountType.CREDIT_CARD,
+    accountName: 'BoA Cash Rewards Visa Signature',
+    balance: -2847.92,
+    availableBalance: 17152.08,
+    currency: 'USD',
+    status: AccountStatus.ACTIVE,
+    lastActivityDate: '2024-01-15T14:22:00Z',
+    openedDate: '2020-06-15T00:00:00Z',
+    creditLimit: 20000,
+    minimumPayment: 35.00,
+    paymentDueDate: '2024-02-05',
+    isPrimary: false
+  },
+  {
+    id: 'acct-004',
+    accountNumber: '****6677',
+    routingNumber: '026009593',
+    accountType: AccountType.MONEY_MARKET,
+    accountName: 'BoA Platinum Money Market',
+    nickname: 'House Down Payment',
+    balance: 125000.00,
+    availableBalance: 125000.00,
+    currency: 'USD',
+    status: AccountStatus.ACTIVE,
+    lastActivityDate: '2024-01-01T00:00:00Z',
+    openedDate: '2022-01-10T00:00:00Z',
+    interestRate: 0.045,
+    isPrimary: false
+  },
+  {
+    id: 'acct-005',
+    accountNumber: '****3344',
+    routingNumber: '026009593',
+    accountType: AccountType.CD,
+    accountName: 'BoA Featured 12-Month CD',
+    balance: 50000.00,
+    availableBalance: 0,
+    currency: 'USD',
+    status: AccountStatus.ACTIVE,
+    lastActivityDate: '2023-07-15T00:00:00Z',
+    openedDate: '2023-07-15T00:00:00Z',
+    interestRate: 0.051,
+    isPrimary: false
+  }
+];

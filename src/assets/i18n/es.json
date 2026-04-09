@@ -1,0 +1,105 @@
+{
+  "app": {
+    "title": "Banca Digital Bank of America",
+    "tagline": "¿Qué te gustaría tener el poder de hacer?",
+    "loading": "Cargando...",
+    "error": "Ocurrió un error. Por favor, inténtelo de nuevo.",
+    "sessionExpired": "Su sesión ha expirado. Por favor, inicie sesión nuevamente."
+  },
+  "nav": {
+    "dashboard": "Panel",
+    "accounts": "Cuentas",
+    "transfers": "Transferencias y Pagos",
+    "billPay": "Pago de Facturas",
+    "alerts": "Alertas y Notificaciones",
+    "profile": "Perfil y Configuración",
+    "signOut": "Cerrar Sesión",
+    "help": "Ayuda y Soporte"
+  },
+  "dashboard": {
+    "welcome": "Bienvenido de nuevo, {{name}}",
+    "totalBalance": "Saldo Total",
+    "quickActions": "Acciones Rápidas",
+    "recentActivity": "Actividad Reciente",
+    "spendingOverview": "Resumen de Gastos",
+    "accountSummary": "Resumen de Cuentas",
+    "viewAll": "Ver Todo"
+  },
+  "accounts": {
+    "title": "Sus Cuentas",
+    "checking": "Cuenta Corriente",
+    "savings": "Ahorros",
+    "creditCard": "Tarjetas de Crédito",
+    "investments": "Inversiones",
+    "currentBalance": "Saldo Actual",
+    "availableBalance": "Saldo Disponible",
+    "accountNumber": "Número de Cuenta",
+    "routingNumber": "Número de Ruta",
+    "viewDetails": "Ver Detalles",
+    "viewTransactions": "Ver Transacciones",
+    "downloadStatement": "Descargar Estado de Cuenta"
+  },
+  "transfers": {
+    "title": "Transferencias y Pagos",
+    "newTransfer": "Nueva Transferencia",
+    "fromAccount": "Desde la Cuenta",
+    "toAccount": "A la Cuenta",
+    "amount": "Monto",
+    "date": "Fecha de Transferencia",
+    "memo": "Memo (opcional)",
+    "frequency": "Frecuencia",
+    "review": "Revisar Transferencia",
+    "confirm": "Confirmar Transferencia",
+    "success": "Transferencia Exitosa",
+    "scheduled": "Transferencias Programadas"
+  },
+  "billPay": {
+    "title": "Pago de Facturas",
+    "payees": "Sus Beneficiarios",
+    "addPayee": "Agregar Beneficiario",
+    "paymentHistory": "Historial de Pagos",
+    "schedulePayment": "Programar Pago",
+    "payNow": "Pagar Ahora"
+  },
+  "alerts": {
+    "title": "Alertas y Notificaciones",
+    "preferences": "Preferencias de Alertas",
+    "feed": "Alertas",
+    "markRead": "Marcar como Leído",
+    "dismiss": "Descartar",
+    "noAlerts": "No hay alertas nuevas"
+  },
+  "profile": {
+    "title": "Perfil y Configuración",
+    "personalInfo": "Información Personal",
+    "security": "Configuración de Seguridad",
+    "notifications": "Preferencias de Notificación",
+    "language": "Idioma",
+    "accessibility": "Accesibilidad"
+  },
+  "common": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "edit": "Editar",
+    "delete": "Eliminar",
+    "close": "Cerrar",
+    "back": "Atrás",
+    "next": "Siguiente",
+    "submit": "Enviar",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "print": "Imprimir",
+    "yes": "Sí",
+    "no": "No",
+    "ok": "Aceptar"
+  },
+  "errors": {
+    "required": "Este campo es obligatorio",
+    "invalidAmount": "Por favor, ingrese un monto válido",
+    "insufficientFunds": "Fondos insuficientes",
+    "networkError": "Error de red. Por favor, verifique su conexión.",
+    "unauthorized": "No está autorizado para realizar esta acción",
+    "notFound": "El recurso solicitado no fue encontrado"
+  }
+}

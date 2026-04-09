@@ -1,0 +1,67 @@
+// BoA Meridian Design System - Variables
+// Based on Bank of America's publicly known brand colors
+
+// Primary Brand Colors
+$boa-navy: #012169;
+$boa-red: #DC1431;
+$boa-white: #FFFFFF;
+$boa-light-gray: #F5F5F5;
+$boa-medium-gray: #767676;
+$boa-dark-gray: #333333;
+$boa-border-gray: #D1D1D1;
+
+// Semantic Colors
+$boa-success: #2E7D32;
+$boa-warning: #F57F17;
+$boa-error: #C62828;
+$boa-info: #0277BD;
+
+// Account Type Colors
+$boa-checking: #012169;
+$boa-savings: #1565C0;
+$boa-credit: #DC1431;
+$boa-investment: #2E7D32;
+
+// Typography
+$boa-font-family: 'Connections', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+$boa-font-size-xs: 12px;
+$boa-font-size-sm: 14px;
+$boa-font-size-base: 16px;
+$boa-font-size-lg: 18px;
+$boa-font-size-xl: 24px;
+$boa-font-size-xxl: 32px;
+$boa-font-size-hero: 40px;
+
+// Spacing
+$boa-spacing-xs: 4px;
+$boa-spacing-sm: 8px;
+$boa-spacing-md: 16px;
+$boa-spacing-lg: 24px;
+$boa-spacing-xl: 32px;
+$boa-spacing-xxl: 48px;
+
+// Border Radius
+$boa-radius-sm: 4px;
+$boa-radius-md: 8px;
+$boa-radius-lg: 12px;
+$boa-radius-pill: 24px;
+
+// Shadows
+$boa-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+$boa-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+$boa-shadow-lg: 0 10px 20px rgba(0, 0, 0, 0.15);
+
+// Breakpoints
+$boa-breakpoint-sm: 576px;
+$boa-breakpoint-md: 768px;
+$boa-breakpoint-lg: 992px;
+$boa-breakpoint-xl: 1200px;
+
+// Z-index layers
+$boa-z-dropdown: 1000;
+$boa-z-sticky: 1020;
+$boa-z-fixed: 1030;
+$boa-z-modal-backdrop: 1040;
+$boa-z-modal: 1050;
+$boa-z-popover: 1060;
+$boa-z-tooltip: 1070;

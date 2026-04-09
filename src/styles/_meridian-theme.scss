@@ -1,0 +1,110 @@
+@use '@angular/material' as mat;
+@use './variables' as vars;
+
+// Custom Meridian Design System Theme for BoA Digital Banking
+// Uses deprecated mat-palette() and mat-color() functions (Angular Material 14 pattern)
+// These will need migration in Angular Material 15+
+
+$boa-navy-palette: (
+  50: #e1e5ed,
+  100: #b3bed2,
+  200: #8193b4,
+  300: #4e6896,
+  400: #284880,
+  500: #012169,
+  600: #011d61,
+  700: #011856,
+  800: #01144c,
+  900: #000b3b,
+  A100: #6f7eff,
+  A200: #3c50ff,
+  A400: #0922ff,
+  A700: #001aef,
+  contrast: (
+    50: rgba(0, 0, 0, 0.87),
+    100: rgba(0, 0, 0, 0.87),
+    200: white,
+    300: white,
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(0, 0, 0, 0.87),
+    A200: white,
+    A400: white,
+    A700: white,
+  )
+);
+
+$boa-red-palette: (
+  50: #fce3e6,
+  100: #f6b9c1,
+  200: #f08b98,
+  300: #ea5d6f,
+  400: #e63a50,
+  500: #DC1431,
+  600: #d8122c,
+  700: #d30e25,
+  800: #ce0b1f,
+  900: #c50613,
+  A100: #fff0f1,
+  A200: #ffbdc1,
+  A400: #ff8a91,
+  A700: #ff717a,
+  contrast: (
+    50: rgba(0, 0, 0, 0.87),
+    100: rgba(0, 0, 0, 0.87),
+    200: rgba(0, 0, 0, 0.87),
+    300: white,
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(0, 0, 0, 0.87),
+    A200: rgba(0, 0, 0, 0.87),
+    A400: rgba(0, 0, 0, 0.87),
+    A700: rgba(0, 0, 0, 0.87),
+  )
+);
+
+// Define the palettes using deprecated mat-palette() function
+// Migration target: These need to use the new theming API in Material 15+
+$boa-primary: mat.define-palette($boa-navy-palette, 500);
+$boa-accent: mat.define-palette($boa-red-palette, 500);
+$boa-warn: mat.define-palette(mat.$red-palette);
+
+// Create the theme using deprecated function
+$boa-theme: mat.define-light-theme((
+  color: (
+    primary: $boa-primary,
+    accent: $boa-accent,
+    warn: $boa-warn,
+  ),
+  typography: mat.define-typography-config(
+    $font-family: vars.$boa-font-family,
+  ),
+  density: 0,
+));
+
+// Apply the theme
+@include mat.all-component-themes($boa-theme);
+
+// Legacy component theme overrides using deprecated mat-color() function
+// These will break in Angular Material 15+
+.mat-toolbar {
+  background-color: mat.get-color-from-palette($boa-primary, 500);
+  color: mat.get-color-from-palette($boa-primary, '500-contrast');
+}
+
+.mat-raised-button.mat-primary {
+  background-color: mat.get-color-from-palette($boa-primary, 500);
+}
+
+.mat-card {
+  border-radius: vars.$boa-radius-md;
+  box-shadow: vars.$boa-shadow-sm;
+}

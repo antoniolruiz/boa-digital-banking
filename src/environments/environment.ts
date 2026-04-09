@@ -3,7 +3,31 @@
 // The list of file replacements can be found in `angular.json`.
 
 export const environment = {
-  production: false
+  production: false,
+  apiBaseUrl: 'https://api-dev.boa-digital.internal/v2',
+  authConfig: {
+    issuer: 'https://sso-dev.boa-digital.internal/auth/realms/digital-banking',
+    clientId: 'boa-digital-banking-spa',
+    redirectUri: 'http://localhost:4200/auth/callback',
+    scope: 'openid profile email accounts transactions',
+    responseType: 'code',
+    silentRefreshRedirectUri: 'http://localhost:4200/silent-refresh.html',
+    sessionCheckInterval: 30000
+  },
+  analyticsConfig: {
+    ericaEndpoint: 'https://erica-analytics-dev.boa-digital.internal/v1/events',
+    samplingRate: 1.0,
+    enableDebug: true
+  },
+  featureFlags: {
+    enableZelle: true,
+    enableMerrillIntegration: false,
+    enableBiometricAuth: false,
+    enablePushNotifications: true
+  },
+  sessionTimeoutMinutes: 15,
+  maxTransferAmount: 10000,
+  piiMaskingEnabled: true
 };
 
 /*

@@ -1,0 +1,105 @@
+{
+  "app": {
+    "title": "Bank of America Digital Banking",
+    "tagline": "What would you like the power to do?",
+    "loading": "Loading...",
+    "error": "An error occurred. Please try again.",
+    "sessionExpired": "Your session has expired. Please sign in again."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "accounts": "Accounts",
+    "transfers": "Transfers & Payments",
+    "billPay": "Bill Pay",
+    "alerts": "Alerts & Notifications",
+    "profile": "Profile & Settings",
+    "signOut": "Sign Out",
+    "help": "Help & Support"
+  },
+  "dashboard": {
+    "welcome": "Welcome back, {{name}}",
+    "totalBalance": "Total Balance",
+    "quickActions": "Quick Actions",
+    "recentActivity": "Recent Activity",
+    "spendingOverview": "Spending Overview",
+    "accountSummary": "Account Summary",
+    "viewAll": "View All"
+  },
+  "accounts": {
+    "title": "Your Accounts",
+    "checking": "Checking",
+    "savings": "Savings",
+    "creditCard": "Credit Cards",
+    "investments": "Investments",
+    "currentBalance": "Current Balance",
+    "availableBalance": "Available Balance",
+    "accountNumber": "Account Number",
+    "routingNumber": "Routing Number",
+    "viewDetails": "View Details",
+    "viewTransactions": "View Transactions",
+    "downloadStatement": "Download Statement"
+  },
+  "transfers": {
+    "title": "Transfers & Payments",
+    "newTransfer": "New Transfer",
+    "fromAccount": "From Account",
+    "toAccount": "To Account",
+    "amount": "Amount",
+    "date": "Transfer Date",
+    "memo": "Memo (optional)",
+    "frequency": "Frequency",
+    "review": "Review Transfer",
+    "confirm": "Confirm Transfer",
+    "success": "Transfer Successful",
+    "scheduled": "Scheduled Transfers"
+  },
+  "billPay": {
+    "title": "Bill Pay",
+    "payees": "Your Payees",
+    "addPayee": "Add Payee",
+    "paymentHistory": "Payment History",
+    "schedulePayment": "Schedule Payment",
+    "payNow": "Pay Now"
+  },
+  "alerts": {
+    "title": "Alerts & Notifications",
+    "preferences": "Alert Preferences",
+    "feed": "Alert Feed",
+    "markRead": "Mark as Read",
+    "dismiss": "Dismiss",
+    "noAlerts": "No new alerts"
+  },
+  "profile": {
+    "title": "Profile & Settings",
+    "personalInfo": "Personal Information",
+    "security": "Security Settings",
+    "notifications": "Notification Preferences",
+    "language": "Language",
+    "accessibility": "Accessibility"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "close": "Close",
+    "back": "Back",
+    "next": "Next",
+    "submit": "Submit",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "print": "Print",
+    "yes": "Yes",
+    "no": "No",
+    "ok": "OK"
+  },
+  "errors": {
+    "required": "This field is required",
+    "invalidAmount": "Please enter a valid amount",
+    "insufficientFunds": "Insufficient funds",
+    "networkError": "Network error. Please check your connection.",
+    "unauthorized": "You are not authorized to perform this action",
+    "notFound": "The requested resource was not found"
+  }
+}

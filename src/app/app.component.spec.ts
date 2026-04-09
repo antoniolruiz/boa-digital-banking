@@ -1,16 +1,35 @@
 import { TestBed } from '@angular/core/testing';
+import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { Observable, of } from 'rxjs';
+import { SharedModule } from './shared/shared.module';
+import { BoaUiModule } from 'boa-ui';
 import { AppComponent } from './app.component';
+import { SsoAuthService } from './core/auth/sso-auth.service';
+import { EricaAnalyticsService } from './core/analytics/erica-analytics.service';
+import { SessionTimeoutService } from './core/auth/session-timeout.service';
+
+class FakeTranslateLoader implements TranslateLoader {
+  getTranslation(): Observable<Record<string, string>> { return of({}); }
+}
 
 describe('AppComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
+        NoopAnimationsModule,
+        HttpClientTestingModule,
+        RouterTestingModule,
+        SharedModule,
+        BoaUiModule,
+        TranslateModule.forRoot({
+          loader: { provide: TranslateLoader, useClass: FakeTranslateLoader }
+        })
       ],
-      declarations: [
-        AppComponent
-      ],
+      declarations: [AppComponent],
+      providers: [SsoAuthService, EricaAnalyticsService, SessionTimeoutService]
     }).compileComponents();
   });
 
@@ -20,16 +39,15 @@ describe('AppComponent', () => {
     expect(app).toBeTruthy();
   });
 
-  it(`should have as title 'boa-digital-banking'`, () => {
+  it('should have app title', () => {
     const fixture = TestBed.createComponent(AppComponent);
     const app = fixture.componentInstance;
-    expect(app.title).toEqual('boa-digital-banking');
+    expect(app.appTitle).toEqual('BoA Digital Banking');
   });
 
-  it('should render title', () => {
+  it('should have navigation items', () => {
     const fixture = TestBed.createComponent(AppComponent);
-    fixture.detectChanges();
-    const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('.content span')?.textContent).toContain('boa-digital-banking app is running!');
+    const app = fixture.componentInstance;
+    expect(app.navItems.length).toBeGreaterThan(0);
   });
 });
