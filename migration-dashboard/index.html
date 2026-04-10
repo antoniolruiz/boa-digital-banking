@@ -903,6 +903,17 @@
           areas = data.areas;
         }
 
+        // Clear any active polling intervals from a previous scan to prevent
+        // stale callbacks from corrupting the new upgradeAreas array.
+        for (const [taskId, intervalId] of Object.entries(pollingIntervals)) {
+          clearInterval(intervalId);
+        }
+        pollingIntervals = {};
+        // Also clear simulation state from old tasks
+        for (const key of Object.keys(simulationState)) {
+          delete simulationState[key];
+        }
+
         upgradeAreas = areas.map(a => ({ ...a, status: 'Pending', taskId: null, sessionUrl: null }));
         renderAreas();
         updateSummary();
