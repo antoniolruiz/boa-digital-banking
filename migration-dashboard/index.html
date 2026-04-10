@@ -784,7 +784,7 @@
      * untrusted data (API responses, user input) into innerHTML.
      */
     function escapeHtml(str) {
-      if (typeof str !== 'string') return String(str);
+      if (typeof str !== 'string') str = String(str);
       return str
         .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
