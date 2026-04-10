@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Angular 14 → 18 Migration Dashboard</title>
+  <style>
+    /* ============================================================
+       CSS VARIABLES & RESET
+       ============================================================ */
+    :root {
+      --color-bg:         #0f1117;
+      --color-surface:    #1a1d27;
+      --color-surface-2:  #242836;
+      --color-border:     #2e3345;
+      --color-text:       #e1e4ed;
+      --color-text-muted: #8b90a0;
+      --color-primary:    #5b8def;
+      --color-primary-hover: #4a7de0;
+      --color-pending:    #6b7280;
+      --color-progress:   #3b82f6;
+      --color-testing:    #f59e0b;
+      --color-completed:  #10b981;
+      --color-failed:     #ef4444;
+      --color-accent:     #a78bfa;
+      --radius:           8px;
+      --radius-lg:        12px;
+      --shadow:           0 2px 8px rgba(0,0,0,0.3);
+      --font-mono:        'SF Mono', 'Cascadia Code', 'Consolas', monospace;
+      --font-sans:        -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--color-bg);
+      color: var(--color-text);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ============================================================
+       LAYOUT
+       ============================================================ */
+    .app-header {
+      background: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: 16px 32px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .app-header h1 {
+      font-size: 18px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .app-header h1 .logo {
+      width: 28px;
+      height: 28px;
+      background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 14px;
+      color: #fff;
+    }
+
+    .version-badge {
+      font-size: 11px;
+      background: var(--color-surface-2);
+      color: var(--color-text-muted);
+      padding: 2px 8px;
+      border-radius: 10px;
+      border: 1px solid var(--color-border);
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 32px;
+    }
+
+    /* ============================================================
+       SCAN SECTION
+       ============================================================ */
+    .scan-section {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      margin-bottom: 24px;
+    }
+
+    .scan-section h2 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .scan-row {
+      display: flex;
+      gap: 12px;
+      align-items: stretch;
+    }
+
+    .scan-input {
+      flex: 1;
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      color: var(--color-text);
+      padding: 10px 14px;
+      font-size: 14px;
+      font-family: var(--font-mono);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .scan-input:focus {
+      border-color: var(--color-primary);
+    }
+
+    .scan-input::placeholder {
+      color: var(--color-text-muted);
+      opacity: 0.6;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: #fff;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--color-primary-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--color-surface-2);
+      color: var(--color-text);
+      border: 1px solid var(--color-border);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      background: var(--color-border);
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .btn-sm {
+      padding: 6px 14px;
+      font-size: 12px;
+    }
+
+    .btn-upgrade {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+      color: #fff;
+      border: none;
+    }
+
+    .btn-upgrade:hover:not(:disabled) {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    /* ============================================================
+       SCANNING INDICATOR
+       ============================================================ */
+    .scan-progress {
+      display: none;
+      margin-top: 16px;
+      padding: 16px;
+      background: var(--color-surface-2);
+      border-radius: var(--radius);
+      border: 1px solid var(--color-border);
+    }
+
+    .scan-progress.active { display: block; }
+
+    .scan-progress-bar {
+      height: 4px;
+      background: var(--color-border);
+      border-radius: 2px;
+      overflow: hidden;
+      margin-bottom: 10px;
+    }
+
+    .scan-progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+      border-radius: 2px;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .scan-progress-text {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid var(--color-border);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    /* ============================================================
+       SUMMARY BAR
+       ============================================================ */
+    .summary-bar {
+      display: none;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .summary-bar.active { display: grid; }
+
+    .summary-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 16px;
+      text-align: center;
+    }
+
+    .summary-card .count {
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.2;
+    }
+
+    .summary-card .label {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+    }
+
+    .summary-card.total .count   { color: var(--color-text); }
+    .summary-card.pending .count { color: var(--color-pending); }
+    .summary-card.progress .count{ color: var(--color-progress); }
+    .summary-card.done .count    { color: var(--color-completed); }
+    .summary-card.failed .count  { color: var(--color-failed); }
+
+    /* ============================================================
+       AREAS TABLE
+       ============================================================ */
+    .areas-section {
+      display: none;
+    }
+
+    .areas-section.active { display: block; }
+
+    .areas-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .areas-header h2 {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .areas-table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .areas-table thead th {
+      background: var(--color-surface-2);
+      padding: 12px 16px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--color-text-muted);
+      text-align: left;
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .areas-table tbody tr {
+      transition: background 0.15s;
+    }
+
+    .areas-table tbody tr:hover {
+      background: var(--color-surface-2);
+    }
+
+    .areas-table tbody td {
+      padding: 14px 16px;
+      font-size: 14px;
+      border-bottom: 1px solid var(--color-border);
+      vertical-align: middle;
+    }
+
+    .areas-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .area-name {
+      font-weight: 600;
+      color: var(--color-text);
+    }
+
+    .area-path {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--color-text-muted);
+      margin-top: 2px;
+    }
+
+    .upgrade-type {
+      font-size: 12px;
+      padding: 3px 10px;
+      border-radius: 10px;
+      font-weight: 500;
+      display: inline-block;
+    }
+
+    .type-standalone    { background: rgba(91,141,239,0.15); color: #7ba3f7; }
+    .type-deprecated    { background: rgba(245,158,11,0.15); color: #fbbf24; }
+    .type-library       { background: rgba(167,139,250,0.15); color: #c4b5fd; }
+    .type-functional    { background: rgba(16,185,129,0.15); color: #34d399; }
+    .type-config        { background: rgba(107,114,128,0.15); color: #9ca3af; }
+    .type-compatibility { background: rgba(239,68,68,0.15); color: #f87171; }
+
+    .priority-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      font-size: 12px;
+      font-weight: 700;
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+    }
+
+    /* ============================================================
+       STATUS BADGES
+       ============================================================ */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .status-pending      { background: rgba(107,114,128,0.15); color: #9ca3af; }
+    .status-in-progress  { background: rgba(59,130,246,0.15);  color: #60a5fa; }
+    .status-tests-running{ background: rgba(245,158,11,0.15);  color: #fbbf24; }
+    .status-completed    { background: rgba(16,185,129,0.15);  color: #34d399; }
+    .status-failed       { background: rgba(239,68,68,0.15);   color: #f87171; }
+
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+    }
+
+    .status-pending .status-dot       { background: #9ca3af; }
+    .status-in-progress .status-dot   { background: #60a5fa; animation: pulse 1.5s ease infinite; }
+    .status-tests-running .status-dot { background: #fbbf24; animation: pulse 1.5s ease infinite; }
+    .status-completed .status-dot     { background: #34d399; }
+    .status-failed .status-dot        { background: #f87171; }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+
+    /* ============================================================
+       DEVIN SESSION LINK
+       ============================================================ */
+    .devin-link {
+      font-size: 12px;
+      color: var(--color-primary);
+      text-decoration: none;
+      font-family: var(--font-mono);
+    }
+
+    .devin-link:hover {
+      text-decoration: underline;
+    }
+
+    /* ============================================================
+       LOG PANEL
+       ============================================================ */
+    .log-panel {
+      display: none;
+      margin-top: 24px;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+    }
+
+    .log-panel.active { display: block; }
+
+    .log-panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--color-surface-2);
+      border-bottom: 1px solid var(--color-border);
+    }
+
+    .log-panel-header h3 {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .log-content {
+      padding: 16px;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--color-text-muted);
+      max-height: 300px;
+      overflow-y: auto;
+      line-height: 1.8;
+    }
+
+    .log-entry {
+      padding: 2px 0;
+    }
+
+    .log-time {
+      color: var(--color-text-muted);
+      opacity: 0.5;
+      margin-right: 8px;
+    }
+
+    .log-info    { color: var(--color-primary); }
+    .log-success { color: var(--color-completed); }
+    .log-warn    { color: var(--color-testing); }
+    .log-error   { color: var(--color-failed); }
+
+    /* ============================================================
+       EMPTY STATE
+       ============================================================ */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--color-text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.3;
+    }
+
+    .empty-state h3 {
+      font-size: 16px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--color-text);
+    }
+
+    .empty-state p {
+      font-size: 14px;
+      max-width: 400px;
+      margin: 0 auto;
+    }
+
+    /* ============================================================
+       CONFIG INDICATOR
+       ============================================================ */
+    .config-status {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .config-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+
+    .config-dot.connected    { background: var(--color-completed); }
+    .config-dot.disconnected { background: var(--color-failed); }
+
+    /* ============================================================
+       TOAST NOTIFICATIONS
+       ============================================================ */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .toast {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 13px;
+      box-shadow: var(--shadow);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      animation: slideIn 0.3s ease;
+      min-width: 300px;
+    }
+
+    .toast.success { border-left: 3px solid var(--color-completed); }
+    .toast.error   { border-left: 3px solid var(--color-failed); }
+    .toast.info    { border-left: 3px solid var(--color-primary); }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to   { transform: translateX(0);    opacity: 1; }
+    }
+
+    /* ============================================================
+       RESPONSIVE
+       ============================================================ */
+    @media (max-width: 900px) {
+      .container { padding: 16px; }
+      .summary-bar { grid-template-columns: repeat(3, 1fr); }
+      .areas-table { font-size: 13px; }
+      .scan-row { flex-direction: column; }
+    }
+
+    @media (max-width: 600px) {
+      .summary-bar { grid-template-columns: repeat(2, 1fr); }
+      .app-header { padding: 12px 16px; }
+      .app-header h1 { font-size: 15px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER
+       ============================================================ -->
+  <header class="app-header">
+    <h1>
+      <span class="logo">Ng</span>
+      Angular Migration Dashboard
+      <span class="version-badge">14 → 18</span>
+    </h1>
+    <div class="config-status" id="configStatus">
+      <span class="config-dot disconnected" id="configDot"></span>
+      <span id="configLabel">Devin API not configured</span>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- ============================================================
+         SCAN SECTION
+         ============================================================ -->
+    <section class="scan-section">
+      <h2>Repository Connection</h2>
+      <div class="scan-row">
+        <input
+          type="text"
+          class="scan-input"
+          id="repoInput"
+          placeholder="Enter repo URL (e.g., https://github.com/org/boa-digital-banking)"
+          value=""
+        />
+        <button class="btn btn-primary" id="scanBtn" onclick="scanRepository()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          Scan Repository
+        </button>
+      </div>
+      <div class="scan-progress" id="scanProgress">
+        <div class="scan-progress-bar">
+          <div class="scan-progress-fill" id="scanProgressFill"></div>
+        </div>
+        <div class="scan-progress-text">
+          <div class="spinner"></div>
+          <span id="scanProgressText">Connecting to repository...</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================
+         SUMMARY BAR
+         ============================================================ -->
+    <div class="summary-bar" id="summaryBar">
+      <div class="summary-card total">
+        <div class="count" id="totalCount">0</div>
+        <div class="label">Total Areas</div>
+      </div>
+      <div class="summary-card pending">
+        <div class="count" id="pendingCount">0</div>
+        <div class="label">Pending</div>
+      </div>
+      <div class="summary-card progress">
+        <div class="count" id="progressCount">0</div>
+        <div class="label">In Progress</div>
+      </div>
+      <div class="summary-card done">
+        <div class="count" id="doneCount">0</div>
+        <div class="label">Completed</div>
+      </div>
+      <div class="summary-card failed">
+        <div class="count" id="failedCount">0</div>
+        <div class="label">Failed</div>
+      </div>
+    </div>
+
+    <!-- ============================================================
+         UPGRADE AREAS TABLE
+         ============================================================ -->
+    <section class="areas-section" id="areasSection">
+      <div class="areas-header">
+        <h2>Upgrade Areas <span id="areasCount"></span></h2>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="refreshAllStatuses()">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0114.85-3.36L23 10"/><path d="M20.49 15a9 9 0 01-14.85 3.36L1 14"/></svg>
+            Refresh Status
+          </button>
+          <button class="btn btn-secondary btn-sm" onclick="upgradeAllPending()">
+            Upgrade All Pending
+          </button>
+        </div>
+      </div>
+      <table class="areas-table">
+        <thead>
+          <tr>
+            <th style="width:40px">#</th>
+            <th>Area</th>
+            <th>Upgrade Type</th>
+            <th>Status</th>
+            <th>Devin Session</th>
+            <th style="width:160px">Action</th>
+          </tr>
+        </thead>
+        <tbody id="areasBody">
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ============================================================
+         EMPTY STATE (shown before scanning)
+         ============================================================ -->
+    <div class="empty-state" id="emptyState">
+      <div class="empty-state-icon">&#x1F50D;</div>
+      <h3>No repository scanned yet</h3>
+      <p>Enter a repository URL above and click "Scan Repository" to detect Angular 14 upgrade areas.</p>
+    </div>
+
+    <!-- ============================================================
+         ACTIVITY LOG
+         ============================================================ -->
+    <div class="log-panel" id="logPanel">
+      <div class="log-panel-header">
+        <h3>Activity Log</h3>
+        <button class="btn btn-secondary btn-sm" onclick="clearLog()">Clear</button>
+      </div>
+      <div class="log-content" id="logContent"></div>
+    </div>
+
+  </div>
+
+  <!-- Toast container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- ============================================================
+       JAVASCRIPT — ALL DASHBOARD LOGIC
+       ============================================================ -->
+  <script>
+    /**
+     * ============================================================
+     * CONFIGURATION
+     * ============================================================
+     *
+     * API endpoints and tokens are loaded from an external config.js
+     * file (see migration-dashboard/config.js). If that file is not
+     * present the dashboard falls back to the defaults below and
+     * runs in simulation mode.
+     *
+     * To connect to real endpoints, create a config.js file alongside
+     * this HTML file with:
+     *
+     *   window.MIGRATION_CONFIG = {
+     *     DEVIN_API_TOKEN: 'your-devin-api-token',
+     *     DEVIN_API_BASE:  'https://api.devin.ai/v1',
+     *     SCAN_API_BASE:   'https://your-backend.example.com/api',
+     *     USE_SIMULATION:  false
+     *   };
+     */
+
+    // Defaults — overridden by config.js if present
+    const CONFIG = {
+      DEVIN_API_TOKEN: '',
+      DEVIN_API_BASE:  'https://api.devin.ai/v1',
+
+      // -------------------------------------------------------
+      // SCAN_API_BASE: The base URL for your scan backend.
+      // Replace with your actual scan microservice endpoint.
+      // Expected endpoints:
+      //   POST {SCAN_API_BASE}/scan  — triggers a repo scan
+      //     Request:  { repoUrl: string }
+      //     Response: { areas: UpgradeArea[] }
+      //
+      //   GET  {SCAN_API_BASE}/scan/status/:scanId
+      //     Response: { status: 'scanning' | 'complete', progress: number, areas?: UpgradeArea[] }
+      // -------------------------------------------------------
+      SCAN_API_BASE: '',
+
+      // When true, uses built-in simulation instead of real API calls.
+      // Set to false once real endpoints are configured.
+      USE_SIMULATION: true
+    };
+
+    // ============================================================
+    // STATE
+    // ============================================================
+    let upgradeAreas = [];
+    let pollingIntervals = {};  // taskId -> intervalId
+    let repoIdentifier = '';
+
+    // ============================================================
+    // INITIALIZATION — load external config if available
+    // ============================================================
+    (function loadConfig() {
+      // Attempt to merge window.MIGRATION_CONFIG set by config.js
+      if (window.MIGRATION_CONFIG) {
+        Object.assign(CONFIG, window.MIGRATION_CONFIG);
+      }
+      updateConfigStatus();
+    })();
+
+    function updateConfigStatus() {
+      const dot   = document.getElementById('configDot');
+      const label = document.getElementById('configLabel');
+      if (CONFIG.DEVIN_API_TOKEN && !CONFIG.USE_SIMULATION) {
+        dot.className   = 'config-dot connected';
+        label.textContent = 'Devin API connected';
+      } else if (CONFIG.USE_SIMULATION) {
+        dot.className   = 'config-dot disconnected';
+        label.textContent = 'Simulation mode';
+      } else {
+        dot.className   = 'config-dot disconnected';
+        label.textContent = 'Devin API not configured';
+      }
+    }
+
+    // ============================================================
+    // SCAN REPOSITORY
+    // ============================================================
+    async function scanRepository() {
+      const input = document.getElementById('repoInput');
+      const btn   = document.getElementById('scanBtn');
+      const url   = input.value.trim();
+
+      if (!url) {
+        showToast('Please enter a repository URL or path.', 'error');
+        input.focus();
+        return;
+      }
+
+      repoIdentifier = url;
+      btn.disabled = true;
+      showScanProgress(true);
+      addLog('info', `Starting scan of ${url}`);
+
+      try {
+        let areas;
+
+        if (CONFIG.USE_SIMULATION) {
+          areas = await simulateScan(url);
+        } else {
+          /**
+           * REAL API CALL — POST /api/scan
+           *
+           * Request body:
+           *   { repoUrl: string }
+           *
+           * Expected response:
+           *   {
+           *     areas: [
+           *       {
+           *         id: string,
+           *         name: string,
+           *         path: string,
+           *         upgradeType: string,
+           *         typeClass: string,
+           *         priority: number,
+           *         dependencies: string[],
+           *         description: string
+           *       }
+           *     ]
+           *   }
+           */
+          const res = await fetch(`${CONFIG.SCAN_API_BASE}/scan`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ repoUrl: url })
+          });
+
+          if (!res.ok) throw new Error(`Scan failed: ${res.status}`);
+          const data = await res.json();
+          areas = data.areas;
+        }
+
+        upgradeAreas = areas.map(a => ({ ...a, status: 'Pending', taskId: null, sessionUrl: null }));
+        renderAreas();
+        updateSummary();
+        showScanProgress(false);
+        document.getElementById('emptyState').style.display = 'none';
+        document.getElementById('areasSection').classList.add('active');
+        document.getElementById('summaryBar').classList.add('active');
+        document.getElementById('logPanel').classList.add('active');
+        addLog('success', `Scan complete — found ${areas.length} upgrade areas`);
+        showToast(`Found ${areas.length} upgrade areas`, 'success');
+      } catch (err) {
+        addLog('error', `Scan error: ${err.message}`);
+        showToast(`Scan failed: ${err.message}`, 'error');
+        showScanProgress(false);
+      } finally {
+        btn.disabled = false;
+      }
+    }
+
+    // ============================================================
+    // RENDER AREAS TABLE
+    // ============================================================
+    function renderAreas() {
+      const tbody = document.getElementById('areasBody');
+      tbody.innerHTML = '';
+
+      upgradeAreas.forEach((area, index) => {
+        const tr = document.createElement('tr');
+
+        const isActionable = area.status === 'Pending' || area.status === 'Failed';
+        const btnDisabled  = !isActionable ? 'disabled' : '';
+        const btnLabel     = area.status === 'Failed' ? 'Retry with Devin' : 'Upgrade with Devin';
+        const sessionLink  = area.sessionUrl
+          ? `<a class="devin-link" href="${area.sessionUrl}" target="_blank">${area.taskId || 'View session'}</a>`
+          : '<span style="color:var(--color-text-muted); font-size:12px;">—</span>';
+
+        tr.innerHTML = `
+          <td><span class="priority-badge">${area.priority}</span></td>
+          <td>
+            <div class="area-name">${area.name}</div>
+            <div class="area-path">${area.path}</div>
+          </td>
+          <td><span class="upgrade-type ${area.typeClass}">${area.upgradeType}</span></td>
+          <td>${renderStatusBadge(area.status)}</td>
+          <td>${sessionLink}</td>
+          <td>
+            <button class="btn btn-upgrade btn-sm" ${btnDisabled} onclick="triggerDevin(${index})">
+              ${btnLabel}
+            </button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+
+      document.getElementById('areasCount').textContent = `(${upgradeAreas.length})`;
+    }
+
+    function renderStatusBadge(status) {
+      const classMap = {
+        'Pending':       'status-pending',
+        'In Progress':   'status-in-progress',
+        'Tests Running': 'status-tests-running',
+        'Completed':     'status-completed',
+        'Failed':        'status-failed'
+      };
+      const cls = classMap[status] || 'status-pending';
+      return `<span class="status-badge ${cls}"><span class="status-dot"></span>${status}</span>`;
+    }
+
+    // ============================================================
+    // SUMMARY
+    // ============================================================
+    function updateSummary() {
+      const counts = { total: upgradeAreas.length, pending: 0, progress: 0, done: 0, failed: 0 };
+      upgradeAreas.forEach(a => {
+        if (a.status === 'Pending')                                  counts.pending++;
+        if (a.status === 'In Progress' || a.status === 'Tests Running') counts.progress++;
+        if (a.status === 'Completed')                                counts.done++;
+        if (a.status === 'Failed')                                   counts.failed++;
+      });
+      document.getElementById('totalCount').textContent   = counts.total;
+      document.getElementById('pendingCount').textContent  = counts.pending;
+      document.getElementById('progressCount').textContent = counts.progress;
+      document.getElementById('doneCount').textContent     = counts.done;
+      document.getElementById('failedCount').textContent   = counts.failed;
+    }
+
+    // ============================================================
+    // TRIGGER DEVIN
+    // ============================================================
+    async function triggerDevin(areaIndex) {
+      const area = upgradeAreas[areaIndex];
+      if (!area || (area.status !== 'Pending' && area.status !== 'Failed')) return;
+
+      area.status = 'In Progress';
+      renderAreas();
+      updateSummary();
+      addLog('info', `Triggering Devin for: ${area.name}`);
+
+      /**
+       * DEVIN TASK PROMPT
+       * This structured prompt is sent as part of the task payload.
+       */
+      const prompt = `You are an Angular migration expert. Your task is to upgrade the following area of this Angular 14 codebase to be fully compatible with Angular 18:
+
+Repo: ${repoIdentifier}
+Area: ${area.name}
+Upgrade type: ${area.upgradeType}
+
+Instructions:
+1. First, run the existing test suite for this area and record the results.
+2. Perform the Angular 14 → Angular 18 migration for this area only, following Angular's official migration guides.
+3. Run the test suite again after migration.
+4. Report success only if all previously passing tests still pass. Report any regressions clearly.
+5. Do not modify areas outside the scope of ${area.name}.
+
+Context:
+- File path: ${area.path}
+- Description: ${area.description}
+- This area has dependency priority ${area.priority} — lower numbers must be migrated first.
+- Dependencies: ${area.dependencies.length > 0 ? area.dependencies.join(', ') : 'None (foundational)'}`;
+
+      try {
+        let taskId, sessionUrl;
+
+        if (CONFIG.USE_SIMULATION) {
+          const result = await simulateDevinTrigger(area);
+          taskId     = result.taskId;
+          sessionUrl = result.sessionUrl;
+        } else {
+          /**
+           * REAL API CALL — POST /v1/sessions
+           *
+           * Devin API endpoint to create a new session.
+           * Docs: https://docs.devin.ai/api-reference
+           *
+           * Request body:
+           *   {
+           *     prompt: string,           // The migration task prompt
+           *     idempotent: boolean       // Prevent duplicate sessions
+           *   }
+           *
+           * Response:
+           *   {
+           *     session_id: string,
+           *     url: string               // Devin session URL
+           *   }
+           */
+          const res = await fetch(`${CONFIG.DEVIN_API_BASE}/sessions`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${CONFIG.DEVIN_API_TOKEN}`
+            },
+            body: JSON.stringify({
+              prompt: prompt,
+              idempotent: true
+            })
+          });
+
+          if (!res.ok) {
+            const errBody = await res.text();
+            throw new Error(`Devin API error ${res.status}: ${errBody}`);
+          }
+
+          const data = await res.json();
+          taskId     = data.session_id;
+          sessionUrl = data.url;
+        }
+
+        area.taskId     = taskId;
+        area.sessionUrl = sessionUrl;
+        renderAreas();
+        addLog('success', `Devin session started for ${area.name}: ${taskId}`);
+        showToast(`Devin started: ${area.name}`, 'info');
+
+        // Start polling for status updates
+        startPolling(areaIndex, taskId);
+
+      } catch (err) {
+        area.status = 'Failed';
+        renderAreas();
+        updateSummary();
+        addLog('error', `Failed to trigger Devin for ${area.name}: ${err.message}`);
+        showToast(`Failed: ${area.name} — ${err.message}`, 'error');
+      }
+    }
+
+    // ============================================================
+    // POLLING
+    // ============================================================
+    function startPolling(areaIndex, taskId) {
+      // Poll every 10 seconds
+      const intervalId = setInterval(async () => {
+        try {
+          let status;
+
+          if (CONFIG.USE_SIMULATION) {
+            status = await simulateStatusCheck(taskId);
+          } else {
+            /**
+             * REAL API CALL — GET /v1/session/:sessionId
+             *
+             * Polls the Devin session status.
+             *
+             * Response:
+             *   {
+             *     session_id: string,
+             *     status: 'running' | 'finished' | 'failed' | 'stopped',
+             *     ...
+             *   }
+             *
+             * Status mapping:
+             *   'running'  → 'In Progress' (or 'Tests Running' if in test phase)
+             *   'finished' → 'Completed'
+             *   'failed'   → 'Failed'
+             *   'stopped'  → 'Failed'
+             */
+            const res = await fetch(`${CONFIG.DEVIN_API_BASE}/session/${taskId}`, {
+              headers: {
+                'Authorization': `Bearer ${CONFIG.DEVIN_API_TOKEN}`
+              }
+            });
+
+            if (!res.ok) throw new Error(`Status check failed: ${res.status}`);
+            const data = await res.json();
+
+            // Map Devin API statuses to dashboard statuses
+            const statusMap = {
+              'running':  'In Progress',
+              'finished': 'Completed',
+              'failed':   'Failed',
+              'stopped':  'Failed'
+            };
+            status = statusMap[data.status] || 'In Progress';
+          }
+
+          const area = upgradeAreas[areaIndex];
+          const prevStatus = area.status;
+          area.status = status;
+
+          if (prevStatus !== status) {
+            renderAreas();
+            updateSummary();
+            addLog(
+              status === 'Completed' ? 'success' : status === 'Failed' ? 'error' : 'info',
+              `${area.name}: ${prevStatus} → ${status}`
+            );
+
+            if (status === 'Completed') {
+              showToast(`${area.name} migration completed!`, 'success');
+            } else if (status === 'Failed') {
+              showToast(`${area.name} migration failed.`, 'error');
+            }
+          }
+
+          // Stop polling when terminal state reached
+          if (status === 'Completed' || status === 'Failed') {
+            clearInterval(intervalId);
+            delete pollingIntervals[taskId];
+          }
+        } catch (err) {
+          addLog('warn', `Polling error for task ${taskId}: ${err.message}`);
+        }
+      }, 10000); // 10-second interval
+
+      pollingIntervals[taskId] = intervalId;
+    }
+
+    // ============================================================
+    // REFRESH ALL STATUSES
+    // ============================================================
+    async function refreshAllStatuses() {
+      addLog('info', 'Manually refreshing all in-progress tasks...');
+      let refreshed = 0;
+
+      for (let i = 0; i < upgradeAreas.length; i++) {
+        const area = upgradeAreas[i];
+        if ((area.status === 'In Progress' || area.status === 'Tests Running') && area.taskId) {
+          try {
+            let status;
+
+            if (CONFIG.USE_SIMULATION) {
+              status = await simulateStatusCheck(area.taskId);
+            } else {
+              const res = await fetch(`${CONFIG.DEVIN_API_BASE}/session/${area.taskId}`, {
+                headers: { 'Authorization': `Bearer ${CONFIG.DEVIN_API_TOKEN}` }
+              });
+              if (!res.ok) continue;
+              const data = await res.json();
+              const statusMap = { 'running': 'In Progress', 'finished': 'Completed', 'failed': 'Failed', 'stopped': 'Failed' };
+              status = statusMap[data.status] || 'In Progress';
+            }
+
+            area.status = status;
+            refreshed++;
+          } catch (err) {
+            // continue to next
+          }
+        }
+      }
+
+      renderAreas();
+      updateSummary();
+      addLog('info', `Refreshed ${refreshed} task(s)`);
+      showToast(`Refreshed ${refreshed} in-progress task(s)`, 'info');
+    }
+
+    // ============================================================
+    // UPGRADE ALL PENDING
+    // ============================================================
+    async function upgradeAllPending() {
+      const pendingAreas = upgradeAreas
+        .map((a, i) => ({ area: a, index: i }))
+        .filter(({ area }) => area.status === 'Pending');
+
+      if (pendingAreas.length === 0) {
+        showToast('No pending areas to upgrade.', 'info');
+        return;
+      }
+
+      addLog('info', `Triggering Devin for ${pendingAreas.length} pending area(s)...`);
+
+      // Trigger sequentially in dependency order (they are already sorted)
+      for (const { index } of pendingAreas) {
+        await triggerDevin(index);
+        // Small delay between triggers to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+    }
+
+    // ============================================================
+    // SIMULATION ENGINE
+    // ============================================================
+
+    /**
+     * Simulates a repository scan by returning realistic upgrade areas
+     * derived from the actual boa-digital-banking Angular 14 codebase.
+     *
+     * Dependency ordering logic:
+     *   1. Foundational: packages & build config (no app-code deps)
+     *   2. Shared libraries: boa-ui design system (depended on by all features)
+     *   3. Core services: auth, analytics, error handling
+     *   4. Shared module: pipes, directives used by features
+     *   5. App-level wiring: routing, root module
+     *   6. Feature modules: leaf nodes, can be migrated in parallel
+     *   7. Downstream consumers: verify after everything else
+     *
+     * To extend: add new areas to the array below, set their priority
+     * and list their dependencies (other area IDs that must migrate first).
+     */
+    async function simulateScan(repoUrl) {
+      // Animate progress bar during simulation
+      const progressFill = document.getElementById('scanProgressFill');
+      const progressText = document.getElementById('scanProgressText');
+
+      const steps = [
+        { pct: 10,  text: 'Cloning repository...' },
+        { pct: 25,  text: 'Analyzing package.json and angular.json...' },
+        { pct: 40,  text: 'Scanning NgModules and dependencies...' },
+        { pct: 55,  text: 'Detecting deprecated APIs (CanActivate, HttpClientModule)...' },
+        { pct: 70,  text: 'Mapping Angular Material v14 components...' },
+        { pct: 85,  text: 'Building dependency graph...' },
+        { pct: 95,  text: 'Generating migration plan...' },
+        { pct: 100, text: 'Scan complete!' }
+      ];
+
+      for (const step of steps) {
+        await delay(400 + Math.random() * 300);
+        progressFill.style.width = step.pct + '%';
+        progressText.textContent = step.text;
+      }
+
+      await delay(300);
+
+      return [
+        {
+          id: 'pkg-deps',
+          name: 'Angular Core & Dependencies',
+          path: 'package.json, angular.json, tsconfig.json',
+          upgradeType: 'Library Update',
+          typeClass: 'type-library',
+          priority: 1,
+          dependencies: [],
+          description: 'Update @angular/* 14.2→18.x, @angular/material 14→18, @angular/cdk, rxjs, zone.js, TypeScript 4.7→5.4, and Angular CLI. Update angular.json builder configs (browser→application).'
+        },
+        {
+          id: 'boa-ui-lib',
+          name: 'Meridian Design System (boa-ui)',
+          path: 'projects/boa-ui/src/lib/',
+          upgradeType: 'Standalone + MDC Migration',
+          typeClass: 'type-standalone',
+          priority: 2,
+          dependencies: ['pkg-deps'],
+          description: 'Convert BoaUiModule to standalone components. Migrate Angular Material from legacy to MDC-based components (v14→v15 legacy prefix, then remove in v18). Remove entryComponents. Update ng-packagr config.'
+        },
+        {
+          id: 'core-module',
+          name: 'CoreModule & Singleton Services',
+          path: 'src/app/core/core.module.ts',
+          upgradeType: 'Standalone + Deprecated API',
+          typeClass: 'type-standalone',
+          priority: 3,
+          dependencies: ['pkg-deps'],
+          description: 'Remove CoreModule.forRoot() pattern. Replace HttpClientModule with provideHttpClient(). Remove entryComponents. Convert class-based HTTP_INTERCEPTORS to functional withInterceptors(). Migrate providers to providedIn: root.'
+        },
+        {
+          id: 'auth-services',
+          name: 'Auth Guard & Interceptor',
+          path: 'src/app/core/auth/',
+          upgradeType: 'Functional Migration',
+          typeClass: 'type-functional',
+          priority: 4,
+          dependencies: ['core-module'],
+          description: 'Convert class-based AuthGuard (CanActivate interface) to functional guard using inject(). Convert AuthInterceptor (HttpInterceptor class) to HttpInterceptorFn. Update SessionTimeoutService.'
+        },
+        {
+          id: 'analytics-sdk',
+          name: 'Erica Analytics SDK Integration',
+          path: 'src/app/core/analytics/',
+          upgradeType: 'Functional Migration',
+          typeClass: 'type-functional',
+          priority: 5,
+          dependencies: ['core-module'],
+          description: 'Convert AnalyticsInterceptor to functional HttpInterceptorFn. Update PageTrackingDirective to standalone. Verify EricaAnalyticsService inject() compatibility.'
+        },
+        {
+          id: 'error-handling',
+          name: 'Error Handling Module',
+          path: 'src/app/core/error-handling/',
+          upgradeType: 'Standalone Migration',
+          typeClass: 'type-standalone',
+          priority: 6,
+          dependencies: ['core-module'],
+          description: 'Convert ErrorPageModule and ErrorPageComponent to standalone. Update GlobalErrorHandler for Angular 18 ErrorHandler API.'
+        },
+        {
+          id: 'shared-module',
+          name: 'SharedModule (Pipes & Directives)',
+          path: 'src/app/shared/',
+          upgradeType: 'Standalone Migration',
+          typeClass: 'type-standalone',
+          priority: 7,
+          dependencies: ['pkg-deps'],
+          description: 'Convert CurrencyFormatPipe, AccountMaskPipe, DateRelativePipe, ClickOutsideDirective, AutoFocusDirective, PermissionCheckDirective to standalone. Eliminate SharedModule barrel.'
+        },
+        {
+          id: 'app-routing',
+          name: 'AppRoutingModule',
+          path: 'src/app/app-routing.module.ts',
+          upgradeType: 'Deprecated API',
+          typeClass: 'type-deprecated',
+          priority: 8,
+          dependencies: ['auth-services', 'shared-module'],
+          description: 'Replace class-based AuthGuard references with functional guard. Migrate to provideRouter() with standalone app bootstrap. Update all lazy-loaded routes for standalone component loading.'
+        },
+        {
+          id: 'app-module',
+          name: 'AppModule → Standalone Bootstrap',
+          path: 'src/app/app.module.ts, src/main.ts',
+          upgradeType: 'Standalone Migration',
+          typeClass: 'type-standalone',
+          priority: 9,
+          dependencies: ['app-routing', 'core-module', 'shared-module', 'boa-ui-lib'],
+          description: 'Replace NgModule bootstrap with standalone bootstrapApplication(). Convert AppComponent to standalone. Move providers to app.config.ts with provideRouter(), provideHttpClient(), provideAnimations().'
+        },
+        {
+          id: 'feat-dashboard',
+          name: 'Dashboard Feature Module',
+          path: 'src/app/features/dashboard/',
+          upgradeType: 'Standalone Migration',
+          typeClass: 'type-standalone',
+          priority: 10,
+          dependencies: ['app-module', 'shared-module', 'boa-ui-lib'],
+          description: 'Convert DashboardModule, DashboardComponent, AccountOverviewComponent, QuickActionsComponent, SpendingChartComponent to standalone components with direct imports.'
+        },
+        {
+          id: 'feat-accounts',
+          name: 'Accounts Feature Module',
+          path: 'src/app/features/accounts/',
+          upgradeType: 'Standalone Migration',
+          typeClass: 'type-standalone',
+          priority: 11,
+          dependencies: ['app-module', 'shared-module', 'boa-ui-lib'],
+          description: 'Convert AccountsModule, AccountListComponent, AccountDetailComponent, TransactionHistoryComponent, StatementDownloadComponent to standalone.'
+        },
+        {
+          id: 'feat-transfers',
+          name: 'Transfers Feature Module',
+          path: 'src/app/features/transfers/',
+          upgradeType: 'Standalone Migration',
+          typeClass: 'type-standalone',
+          priority: 12,
+          dependencies: ['app-module', 'shared-module', 'boa-ui-lib'],
+          description: 'Convert TransfersModule, TransferFormComponent, TransferReviewComponent, TransferConfirmationComponent, ScheduledTransfersComponent to standalone.'
+        },
+        {
+          id: 'feat-billpay',
+          name: 'Bill Pay Feature Module',
+          path: 'src/app/features/bill-pay/',
+          upgradeType: 'Standalone Migration',
+          typeClass: 'type-standalone',
+          priority: 13,
+          dependencies: ['app-module', 'shared-module', 'boa-ui-lib'],
+          description: 'Convert BillPayModule, PayeeListComponent, AddPayeeComponent, PaymentHistoryComponent to standalone.'
+        },
+        {
+          id: 'feat-alerts',
+          name: 'Alerts Feature Module',
+          path: 'src/app/features/alerts/',
+          upgradeType: 'Standalone Migration',
+          typeClass: 'type-standalone',
+          priority: 14,
+          dependencies: ['app-module', 'shared-module', 'boa-ui-lib'],
+          description: 'Convert AlertsModule, AlertFeedComponent, AlertDetailComponent, AlertPreferencesComponent to standalone. Update setInterval polling pattern.'
+        },
+        {
+          id: 'feat-profile',
+          name: 'Profile Feature Module',
+          path: 'src/app/features/profile/',
+          upgradeType: 'Standalone Migration',
+          typeClass: 'type-standalone',
+          priority: 15,
+          dependencies: ['app-module', 'shared-module', 'boa-ui-lib'],
+          description: 'Convert ProfileModule, ProfileSettingsComponent, SecuritySettingsComponent, NotificationPreferencesComponent to standalone.'
+        },
+        {
+          id: 'downstream',
+          name: 'Downstream Consumer Compatibility',
+          path: 'downstream-consumer/',
+          upgradeType: 'Compatibility Verification',
+          typeClass: 'type-compatibility',
+          priority: 16,
+          dependencies: ['boa-ui-lib', 'pkg-deps'],
+          description: 'Verify downstream-consumer app still builds and passes tests after boa-ui library migration. Update its Angular version and imports to match. Validate no breaking changes in public API.'
+        },
+        {
+          id: 'build-tooling',
+          name: 'Build & Tooling Configuration',
+          path: 'angular.json, .eslintrc.json, .browserslistrc, karma.conf.js',
+          upgradeType: 'Config Update',
+          typeClass: 'type-config',
+          priority: 17,
+          dependencies: ['pkg-deps', 'app-module'],
+          description: 'Update angular.json builders (browser→application). Update ESLint to @angular-eslint v18. Update browserslist targets. Migrate Karma/Jasmine test config if moving to Jest. Remove polyfills.ts (zone.js loaded via angular.json).'
+        }
+      ];
+    }
+
+    /**
+     * Simulates triggering a Devin session.
+     * Returns a mock task ID and session URL.
+     */
+    async function simulateDevinTrigger(area) {
+      await delay(800 + Math.random() * 400);
+      const taskId = 'devin-' + Date.now().toString(36) + '-' + Math.random().toString(36).substring(2, 7);
+      return {
+        taskId,
+        sessionUrl: `https://app.devin.ai/sessions/${taskId}`
+      };
+    }
+
+    /**
+     * Simulates checking the status of a Devin session.
+     * Progresses through: In Progress → Tests Running → Completed/Failed
+     *
+     * Each simulated task takes ~30-60s to "complete" with 90% success rate.
+     */
+    const simulationState = {};
+
+    async function simulateStatusCheck(taskId) {
+      if (!simulationState[taskId]) {
+        simulationState[taskId] = {
+          startTime: Date.now(),
+          duration: 25000 + Math.random() * 35000,  // 25-60s
+          willSucceed: Math.random() > 0.1           // 90% success rate
+        };
+      }
+
+      const state   = simulationState[taskId];
+      const elapsed = Date.now() - state.startTime;
+      const pct     = elapsed / state.duration;
+
+      if (pct < 0.6) {
+        return 'In Progress';
+      } else if (pct < 0.85) {
+        return 'Tests Running';
+      } else if (pct >= 1.0) {
+        return state.willSucceed ? 'Completed' : 'Failed';
+      } else {
+        return 'Tests Running';
+      }
+    }
+
+    // ============================================================
+    // UI HELPERS
+    // ============================================================
+    function showScanProgress(show) {
+      const el = document.getElementById('scanProgress');
+      if (show) {
+        el.classList.add('active');
+        document.getElementById('scanProgressFill').style.width = '0%';
+      } else {
+        el.classList.remove('active');
+      }
+    }
+
+    function addLog(level, message) {
+      const container = document.getElementById('logContent');
+      const time = new Date().toLocaleTimeString();
+      const entry = document.createElement('div');
+      entry.className = 'log-entry';
+      entry.innerHTML = `<span class="log-time">${time}</span><span class="log-${level}">${message}</span>`;
+      container.appendChild(entry);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    function showToast(message, type) {
+      const container = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+      toast.textContent = message;
+      container.appendChild(toast);
+
+      setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transition = 'opacity 0.3s';
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }
+
+    function clearLog() {
+      document.getElementById('logContent').innerHTML = '';
+    }
+
+    function delay(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+  </script>
+
+  <!-- ============================================================
+       EXTERNAL CONFIG LOADER
+       Load config.js AFTER the main script so window.MIGRATION_CONFIG
+       can be set. If config.js is missing this script tag is ignored.
+       ============================================================ -->
+  <script src="config.js" onerror="console.log('[Migration Dashboard] No config.js found — running in simulation mode.')"></script>
+  <script>
+    // Re-check config after external file loads
+    if (window.MIGRATION_CONFIG) {
+      Object.assign(CONFIG, window.MIGRATION_CONFIG);
+      updateConfigStatus();
+    }
+  </script>
+</body>
+</html>

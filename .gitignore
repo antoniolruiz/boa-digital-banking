@@ -40,3 +40,6 @@ testem.log
 # System files
 .DS_Store
 Thumbs.db
+
+# Migration dashboard secrets (never commit real API tokens)
+migration-dashboard/config.js
