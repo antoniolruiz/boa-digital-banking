@@ -776,6 +776,43 @@
     };
 
     // ============================================================
+    // SECURITY HELPERS
+    // ============================================================
+
+    /**
+     * Escape HTML entities to prevent XSS when interpolating
+     * untrusted data (API responses, user input) into innerHTML.
+     */
+    function escapeHtml(str) {
+      if (typeof str !== 'string') return String(str);
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    /**
+     * Sanitize a URL to only allow http/https protocols.
+     * Prevents javascript: and data: URI attacks in href attributes.
+     */
+    function sanitizeUrl(url) {
+      if (typeof url !== 'string') return '#';
+      const trimmed = url.trim();
+      if (/^https?:\/\//i.test(trimmed)) return escapeHtml(trimmed);
+      return '#';
+    }
+
+    /**
+     * Sanitize a CSS class name — allow only alphanumeric, hyphens, underscores.
+     */
+    function sanitizeClass(cls) {
+      if (typeof cls !== 'string') return '';
+      return cls.replace(/[^a-zA-Z0-9_-]/g, '');
+    }
+
+    // ============================================================
     // STATE
     // ============================================================
     let upgradeAreas = [];
@@ -899,16 +936,16 @@
         const btnDisabled  = !isActionable ? 'disabled' : '';
         const btnLabel     = area.status === 'Failed' ? 'Retry with Devin' : 'Upgrade with Devin';
         const sessionLink  = area.sessionUrl
-          ? `<a class="devin-link" href="${area.sessionUrl}" target="_blank">${area.taskId || 'View session'}</a>`
+          ? `<a class="devin-link" href="${sanitizeUrl(area.sessionUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(area.taskId || 'View session')}</a>`
           : '<span style="color:var(--color-text-muted); font-size:12px;">—</span>';
 
         tr.innerHTML = `
-          <td><span class="priority-badge">${area.priority}</span></td>
+          <td><span class="priority-badge">${escapeHtml(area.priority)}</span></td>
           <td>
-            <div class="area-name">${area.name}</div>
-            <div class="area-path">${area.path}</div>
+            <div class="area-name">${escapeHtml(area.name)}</div>
+            <div class="area-path">${escapeHtml(area.path)}</div>
           </td>
-          <td><span class="upgrade-type ${area.typeClass}">${area.upgradeType}</span></td>
+          <td><span class="upgrade-type ${sanitizeClass(area.typeClass)}">${escapeHtml(area.upgradeType)}</span></td>
           <td>${renderStatusBadge(area.status)}</td>
           <td>${sessionLink}</td>
           <td>
@@ -1478,7 +1515,7 @@ Context:
       const time = new Date().toLocaleTimeString();
       const entry = document.createElement('div');
       entry.className = 'log-entry';
-      entry.innerHTML = `<span class="log-time">${time}</span><span class="log-${level}">${message}</span>`;
+      entry.innerHTML = `<span class="log-time">${escapeHtml(time)}</span><span class="log-${sanitizeClass(level)}">${escapeHtml(message)}</span>`;
       container.appendChild(entry);
       container.scrollTop = container.scrollHeight;
     }
