@@ -58,12 +58,6 @@ import { ErrorPageComponent } from './error-handling/error-page.component';
     ErrorPageComponent,
     PageTrackingDirective,
   ],
-  // entryComponents is a ViewEngine-era artifact.
-  // It's a no-op with Ivy but present in many Angular 14 codebases.
-  entryComponents: [
-    MfaChallengeComponent,
-    ErrorPageComponent,
-  ],
   providers: [
     // Class-based HTTP interceptors - migration target for Angular 15+
     {

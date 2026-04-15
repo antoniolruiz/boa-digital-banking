@@ -112,17 +112,6 @@ import { MeridianA11yService } from './services/meridian-a11y.service';
     MatBadgeModule,
     MatDividerModule,
   ],
-  // entryComponents is a ViewEngine-era artifact
-  entryComponents: [
-    MeridianButtonComponent,
-    MeridianCardComponent,
-    MeridianDataTableComponent,
-    MeridianFormFieldComponent,
-    MeridianAlertBannerComponent,
-    MeridianNavShellComponent,
-    MeridianAccountSummaryComponent,
-    MeridianSecureBadgeComponent,
-  ],
   providers: [
     MeridianModalService,
     MeridianThemeService,
