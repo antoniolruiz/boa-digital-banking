@@ -90,8 +90,20 @@ $boa-theme: mat.define-light-theme((
   density: 0,
 ));
 
-// Apply the theme
+// Apply legacy component themes (for MatLegacy* prefixed components)
 @include mat.all-legacy-component-themes($boa-theme);
+
+// Apply themes for non-legacy components that don't have a legacy variant in Material 15.
+// These are excluded by all-legacy-component-themes and must be themed individually.
+@include mat.core-theme($boa-theme);
+@include mat.toolbar-theme($boa-theme);
+@include mat.sidenav-theme($boa-theme);
+@include mat.icon-theme($boa-theme);
+@include mat.sort-theme($boa-theme);
+@include mat.badge-theme($boa-theme);
+@include mat.divider-theme($boa-theme);
+@include mat.expansion-theme($boa-theme);
+@include mat.datepicker-theme($boa-theme);
 
 // Legacy component theme overrides using deprecated mat-color() function
 // These will break in Angular Material 15+
