@@ -1,4 +1,6 @@
 import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
 
 /**
  * Meridian Account Summary - Account card with balance display.
@@ -6,6 +8,8 @@ import { Component, Input } from '@angular/core';
  */
 @Component({
   selector: 'meridian-account-summary',
+  standalone: true,
+  imports: [CommonModule, MatIconModule],
   template: `
     <div [ngClass]="summaryClasses" (click)="!disabled && null" role="article"
          [attr.aria-label]="accountName + ' account summary'">

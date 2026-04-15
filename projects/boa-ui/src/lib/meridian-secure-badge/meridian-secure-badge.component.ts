@@ -1,4 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { MatIconModule } from '@angular/material/icon';
+import { MatLegacyButtonModule } from '@angular/material/legacy-button';
+import { MatLegacyTooltipModule } from '@angular/material/legacy-tooltip';
 
 /**
  * Meridian Secure Badge - PII masking toggle component.
@@ -6,6 +9,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
  */
 @Component({
   selector: 'meridian-secure-badge',
+  standalone: true,
+  imports: [MatIconModule, MatLegacyButtonModule, MatLegacyTooltipModule],
   template: `
     <span class="meridian-secure" [attr.aria-label]="getAriaLabel()">
       <span class="meridian-secure-value">{{ displayValue }}</span>

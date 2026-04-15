@@ -1,4 +1,7 @@
 import { Component, Input } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatLegacyCardModule } from '@angular/material/legacy-card';
+import { MatIconModule } from '@angular/material/icon';
 
 /**
  * Meridian Card Component - Themed card container
@@ -6,6 +9,8 @@ import { Component, Input } from '@angular/core';
  */
 @Component({
   selector: 'meridian-card',
+  standalone: true,
+  imports: [CommonModule, MatLegacyCardModule, MatIconModule],
   template: `
     <mat-card [ngClass]="cardClasses" [attr.role]="role">
       <mat-card-header *ngIf="title || subtitle">

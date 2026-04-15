@@ -50,22 +50,20 @@ import { PermissionCheckDirective } from './directives/permission-check.directiv
  * eliminating the need for this barrel module.
  */
 @NgModule({
-  declarations: [
-    // Pipes
-    CurrencyFormatPipe,
-    AccountMaskPipe,
-    DateRelativePipe,
-    // Directives
-    ClickOutsideDirective,
-    AutoFocusDirective,
-    PermissionCheckDirective,
-  ],
   imports: [
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
     TranslateModule,
+    // Standalone pipes (Angular 15 standalone adoption)
+    CurrencyFormatPipe,
+    AccountMaskPipe,
+    DateRelativePipe,
+    // Standalone directives (Angular 15 standalone adoption)
+    ClickOutsideDirective,
+    AutoFocusDirective,
+    PermissionCheckDirective,
     // Material Modules
     MatButtonModule,
     MatCardModule,

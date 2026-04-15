@@ -7,7 +7,8 @@ import { Pipe, PipeTransform } from '@angular/core';
  * Usage: {{ dateString | dateRelative }}
  */
 @Pipe({
-  name: 'dateRelative'
+  name: 'dateRelative',
+  standalone: true
 })
 export class DateRelativePipe implements PipeTransform {
   transform(value: string | Date | null | undefined, format: 'short' | 'long' = 'short'): string {

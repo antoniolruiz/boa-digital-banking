@@ -9,7 +9,8 @@ import { SsoAuthService } from '../../core/auth/sso-auth.service';
  * Usage with else: <div *boaPermissionCheck="'admin'; else noAccess">Admin content</div>
  */
 @Directive({
-  selector: '[boaPermissionCheck]'
+  selector: '[boaPermissionCheck]',
+  standalone: true
 })
 export class PermissionCheckDirective implements OnInit {
   private permission = '';

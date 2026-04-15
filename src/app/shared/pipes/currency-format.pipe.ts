@@ -7,7 +7,8 @@ import { Pipe, PipeTransform } from '@angular/core';
  * Usage: {{ amount | boaCurrency:'USD':'symbol' }}
  */
 @Pipe({
-  name: 'boaCurrency'
+  name: 'boaCurrency',
+  standalone: true
 })
 export class CurrencyFormatPipe implements PipeTransform {
   transform(

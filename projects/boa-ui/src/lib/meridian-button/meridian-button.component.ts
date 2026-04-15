@@ -1,4 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatLegacyProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
 
 /**
  * Meridian Button Component - Custom button wrapping mat-button
@@ -7,6 +10,8 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
  */
 @Component({
   selector: 'meridian-button',
+  standalone: true,
+  imports: [CommonModule, MatIconModule, MatLegacyProgressSpinnerModule],
   template: `
     <button [ngClass]="buttonClasses"
             [attr.type]="type"

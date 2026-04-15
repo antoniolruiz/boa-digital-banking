@@ -1,4 +1,7 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+import { MatLegacyButtonModule } from '@angular/material/legacy-button';
 
 export type AlertBannerType = 'info' | 'success' | 'warning' | 'error';
 
@@ -8,6 +11,8 @@ export type AlertBannerType = 'info' | 'success' | 'warning' | 'error';
  */
 @Component({
   selector: 'meridian-alert-banner',
+  standalone: true,
+  imports: [CommonModule, MatIconModule, MatLegacyButtonModule],
   template: `
     <div [ngClass]="bannerClasses"
          [attr.role]="role"

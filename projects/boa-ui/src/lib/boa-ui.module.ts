@@ -53,14 +53,10 @@ import { MeridianA11yService } from './services/meridian-a11y.service';
  */
 @NgModule({
   declarations: [
-    MeridianButtonComponent,
-    MeridianCardComponent,
+    // Non-standalone components (complex, to be converted in later phases)
     MeridianDataTableComponent,
     MeridianFormFieldComponent,
-    MeridianAlertBannerComponent,
     MeridianNavShellComponent,
-    MeridianAccountSummaryComponent,
-    MeridianSecureBadgeComponent,
   ],
   imports: [
     CommonModule,
@@ -84,6 +80,12 @@ import { MeridianA11yService } from './services/meridian-a11y.service';
     MatSortModule,
     MatBadgeModule,
     MatDividerModule,
+    // Standalone components (Angular 15 standalone adoption)
+    MeridianButtonComponent,
+    MeridianCardComponent,
+    MeridianAlertBannerComponent,
+    MeridianAccountSummaryComponent,
+    MeridianSecureBadgeComponent,
   ],
   exports: [
     MeridianButtonComponent,

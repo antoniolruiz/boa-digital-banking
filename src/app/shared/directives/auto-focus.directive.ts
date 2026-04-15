@@ -8,7 +8,8 @@ import { Directive, ElementRef, AfterViewInit, Input } from '@angular/core';
  * Usage with delay: <input boaAutoFocus [autoFocusDelay]="200" />
  */
 @Directive({
-  selector: '[boaAutoFocus]'
+  selector: '[boaAutoFocus]',
+  standalone: true
 })
 export class AutoFocusDirective implements AfterViewInit {
   @Input() autoFocusDelay = 0;

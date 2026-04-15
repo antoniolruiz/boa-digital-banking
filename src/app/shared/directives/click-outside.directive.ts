@@ -7,7 +7,8 @@ import { Directive, ElementRef, EventEmitter, HostListener, Output } from '@angu
  * Usage: <div boaClickOutside (clickOutside)="onClose()">
  */
 @Directive({
-  selector: '[boaClickOutside]'
+  selector: '[boaClickOutside]',
+  standalone: true
 })
 export class ClickOutsideDirective {
   @Output() boaClickOutside = new EventEmitter<MouseEvent>();

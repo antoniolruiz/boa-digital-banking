@@ -8,7 +8,8 @@ import { Pipe, PipeTransform } from '@angular/core';
  * Output: '****7890'
  */
 @Pipe({
-  name: 'accountMask'
+  name: 'accountMask',
+  standalone: true
 })
 export class AccountMaskPipe implements PipeTransform {
   transform(
