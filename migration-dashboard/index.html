@@ -1130,14 +1130,16 @@
       showToast('Previous session restored from local storage', 'info');
       updatePersistIndicator(true, saved.savedAt);
 
-      // Resume polling for any in-progress tasks
-      migrationPhases.forEach((phase, pi) => {
-        phase.tasks.forEach((task, ti) => {
-          if ((task.status === 'In Progress' || task.status === 'Tests Running') && task.taskId) {
-            startPolling(pi, ti, task.taskId);
-          }
+      // Resume polling for any in-progress tasks (only if API token is available)
+      if (CONFIG.DEVIN_API_TOKEN) {
+        migrationPhases.forEach((phase, pi) => {
+          phase.tasks.forEach((task, ti) => {
+            if ((task.status === 'In Progress' || task.status === 'Tests Running') && task.taskId) {
+              startPolling(pi, ti, task.taskId);
+            }
+          });
         });
-      });
+      }
 
       return true;
     }
