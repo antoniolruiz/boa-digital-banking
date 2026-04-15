@@ -84,14 +84,14 @@ $boa-theme: mat.define-light-theme((
     accent: $boa-accent,
     warn: $boa-warn,
   ),
-  typography: mat.define-typography-config(
+  typography: mat.define-legacy-typography-config(
     $font-family: vars.$boa-font-family,
   ),
   density: 0,
 ));
 
 // Apply the theme
-@include mat.all-component-themes($boa-theme);
+@include mat.all-legacy-component-themes($boa-theme);
 
 // Legacy component theme overrides using deprecated mat-color() function
 // These will break in Angular Material 15+
