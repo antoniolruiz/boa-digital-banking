@@ -736,6 +736,91 @@
     }
 
     /* ============================================================
+       PHASE PROGRESS BAR (overall migration progress)
+       ============================================================ */
+    .overall-progress {
+      display: none;
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .overall-progress.active { display: block; }
+
+    .overall-progress h3 {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--boa-navy);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .overall-progress h3 span {
+      font-size: 13px;
+      color: var(--color-text-muted);
+      font-weight: 400;
+    }
+
+    .progress-phases {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .progress-phase {
+      flex: 1;
+      text-align: center;
+    }
+
+    .progress-phase-bar {
+      height: 8px;
+      border-radius: 4px;
+      background: var(--color-border);
+      overflow: hidden;
+      margin-bottom: 6px;
+    }
+
+    .progress-phase-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.5s ease;
+      width: 0%;
+    }
+
+    .progress-phase-fill.fill-complete  { background: var(--color-completed); width: 100%; }
+    .progress-phase-fill.fill-active    { background: linear-gradient(90deg, var(--boa-navy), var(--boa-red)); }
+    .progress-phase-fill.fill-locked    { background: var(--color-locked); width: 0%; }
+
+    .progress-phase-label {
+      font-size: 11px;
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+
+    .progress-phase.phase-done .progress-phase-label { color: var(--color-completed); }
+    .progress-phase.phase-current .progress-phase-label { color: var(--boa-navy); font-weight: 700; }
+
+    /* ============================================================
+       STATE PERSISTENCE INDICATOR
+       ============================================================ */
+    .persist-indicator {
+      font-size: 11px;
+      color: rgba(255,255,255,0.6);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .persist-indicator.has-state {
+      color: rgba(255,255,255,0.9);
+    }
+
+    /* ============================================================
        RESPONSIVE
        ============================================================ */
     @media (max-width: 900px) {
@@ -763,9 +848,15 @@
       Angular Migration Dashboard
       <span class="version-badge">14 → 18</span>
     </h1>
-    <div class="config-status" id="configStatus">
-      <span class="config-dot disconnected" id="configDot"></span>
-      <span id="configLabel">Devin API not configured</span>
+    <div style="display:flex; align-items:center; gap:16px;">
+      <div class="persist-indicator" id="persistIndicator">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21H5a2 2 0 01-2-2V5a2 2 0 012-2h11l5 5v11a2 2 0 01-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+        <span id="persistLabel">No saved state</span>
+      </div>
+      <div class="config-status" id="configStatus">
+        <span class="config-dot disconnected" id="configDot"></span>
+        <span id="configLabel">Devin API not configured</span>
+      </div>
     </div>
   </header>
 
@@ -835,6 +926,17 @@
     </div>
 
     <!-- ============================================================
+         OVERALL MIGRATION PROGRESS
+         ============================================================ -->
+    <div class="overall-progress" id="overallProgress">
+      <h3>
+        Migration Progress
+        <span id="overallProgressText">0 / 27 tasks complete</span>
+      </h3>
+      <div class="progress-phases" id="progressPhases"></div>
+    </div>
+
+    <!-- ============================================================
          PHASES CONTAINER — sequential Angular upgrade phases
          ============================================================ -->
     <div class="phases-container" id="phasesContainer"></div>
@@ -854,7 +956,10 @@
     <div class="log-panel" id="logPanel">
       <div class="log-panel-header">
         <h3>Activity Log</h3>
-        <button class="btn btn-secondary btn-sm" onclick="clearLog()">Clear</button>
+        <div style="display:flex; gap:8px;">
+          <button class="btn btn-secondary btn-sm" onclick="clearLog()">Clear Log</button>
+          <button class="btn btn-secondary btn-sm" style="color:var(--boa-red);border-color:rgba(227,24,55,0.3)" onclick="resetDashboard()">Reset All</button>
+        </div>
       </div>
       <div class="log-content" id="logContent"></div>
     </div>
@@ -938,6 +1043,119 @@
     let repoName = '';
 
     // ============================================================
+    // LOCAL STORAGE PERSISTENCE — survive page refreshes during demos
+    // ============================================================
+    const STORAGE_KEY = 'boa-migration-dashboard-state';
+
+    function saveState() {
+      try {
+        const state = {
+          repoIdentifier,
+          repoOwner,
+          repoName,
+          phases: migrationPhases.map(phase => ({
+            id: phase.id,
+            tasks: phase.tasks.map(task => ({
+              id: task.id,
+              status: task.status,
+              taskId: task.taskId,
+              sessionUrl: task.sessionUrl
+            }))
+          })),
+          savedAt: new Date().toISOString()
+        };
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        updatePersistIndicator(true, state.savedAt);
+      } catch (e) { /* localStorage not available */ }
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch (e) { return null; }
+    }
+
+    function clearSavedState() {
+      try { localStorage.removeItem(STORAGE_KEY); } catch (e) {}
+      updatePersistIndicator(false);
+    }
+
+    function restoreState() {
+      const saved = loadState();
+      if (!saved || !saved.phases || !saved.repoIdentifier) return false;
+
+      repoIdentifier = saved.repoIdentifier;
+      repoOwner      = saved.repoOwner || '';
+      repoName       = saved.repoName || '';
+
+      migrationPhases = buildMigrationPhases();
+      migrationPhases.forEach(phase => {
+        phase.tasks.forEach(task => {
+          task.status     = 'Pending';
+          task.taskId     = null;
+          task.sessionUrl = null;
+        });
+      });
+
+      // Merge saved task statuses
+      saved.phases.forEach(savedPhase => {
+        const phase = migrationPhases.find(p => p.id === savedPhase.id);
+        if (!phase) return;
+        savedPhase.tasks.forEach(savedTask => {
+          const task = phase.tasks.find(t => t.id === savedTask.id);
+          if (!task) return;
+          task.status     = savedTask.status || 'Pending';
+          task.taskId     = savedTask.taskId || null;
+          task.sessionUrl = savedTask.sessionUrl || null;
+        });
+      });
+
+      // Update the repo input
+      document.getElementById('repoInput').value = repoIdentifier;
+
+      renderPhases();
+      updateSummary();
+      updateOverallProgress();
+      document.getElementById('emptyState').style.display = 'none';
+      document.getElementById('phasesContainer').classList.add('active');
+      document.getElementById('summaryBar').classList.add('active');
+      document.getElementById('overallProgress').classList.add('active');
+      document.getElementById('logPanel').classList.add('active');
+
+      const totalTasks     = migrationPhases.reduce((sum, p) => sum + p.tasks.length, 0);
+      const completedTasks = migrationPhases.reduce((sum, p) => sum + p.tasks.filter(t => t.status === 'Completed').length, 0);
+      addLog('info', `Restored saved state: ${completedTasks}/${totalTasks} tasks complete (saved ${new Date(saved.savedAt).toLocaleString()})`);
+      showToast('Previous session restored from local storage', 'info');
+      updatePersistIndicator(true, saved.savedAt);
+
+      // Resume polling for any in-progress tasks
+      migrationPhases.forEach((phase, pi) => {
+        phase.tasks.forEach((task, ti) => {
+          if ((task.status === 'In Progress' || task.status === 'Tests Running') && task.taskId) {
+            startPolling(pi, ti, task.taskId);
+          }
+        });
+      });
+
+      return true;
+    }
+
+    function updatePersistIndicator(hasState, savedAt) {
+      const el    = document.getElementById('persistIndicator');
+      const label = document.getElementById('persistLabel');
+      if (hasState) {
+        el.classList.add('has-state');
+        const timeStr = savedAt ? new Date(savedAt).toLocaleTimeString() : '';
+        label.textContent = timeStr ? `State saved ${timeStr}` : 'State saved';
+      } else {
+        el.classList.remove('has-state');
+        label.textContent = 'No saved state';
+      }
+    }
+
+    // ============================================================
     // INITIALIZATION
     // ============================================================
     (function init() {
@@ -948,6 +1166,12 @@
 
       if (!CONFIG.DEVIN_API_TOKEN || !CONFIG.GITHUB_TOKEN) {
         showErrorBanner('Create a <code>config.js</code> file with your DEVIN_API_TOKEN and GITHUB_TOKEN. See <code>config.example.js</code> for the template.');
+      }
+
+      // Attempt to restore previous state from localStorage
+      const restored = restoreState();
+      if (!restored) {
+        updatePersistIndicator(false);
       }
     })();
 
@@ -1367,10 +1591,13 @@
 
         renderPhases();
         updateSummary();
+        updateOverallProgress();
+        saveState();
         showScanProgress(false);
         document.getElementById('emptyState').style.display = 'none';
         document.getElementById('phasesContainer').classList.add('active');
         document.getElementById('summaryBar').classList.add('active');
+        document.getElementById('overallProgress').classList.add('active');
         document.getElementById('logPanel').classList.add('active');
 
         const totalTasks = migrationPhases.reduce((sum, p) => sum + p.tasks.length, 0);
@@ -1581,12 +1808,14 @@
       task.status = 'In Progress';
       renderPhases();
       updateSummary();
+      updateOverallProgress();
+      saveState();
       addLog('info', `Triggering Devin for: ${task.name} (${phase.name})`);
 
-      const prompt = `You are an Angular migration expert. Perform the following migration step on this Angular codebase.
+      const prompt = `You are an Angular migration expert. Perform the following migration step on the boa-digital-banking Angular codebase.
 
 Repository: ${repoIdentifier}
-Migration Phase: ${phase.name}
+Migration Phase: ${phase.name} (Phase ${migrationPhases.indexOf(phase) + 1} of ${migrationPhases.length})
 Task: ${task.name}
 Task Type: ${task.taskType}
 
@@ -1595,16 +1824,36 @@ Requirements for this phase:
 - TypeScript: ${phase.requirements.typescript}
 - Angular: ${phase.requirements.angular}
 
+Repository Architecture:
+- Main app: src/app/ (Angular 14 enterprise banking app with CoreModule/SharedModule pattern)
+- Shared library: projects/boa-ui/ (@boa-ui/meridian-design-system — 9 components)
+- Downstream consumer: downstream-consumer/ (must continue building after migration)
+- Build order: ng build boa-ui → ng build boa-digital-banking → (cd downstream-consumer && ng build)
+
 Instructions:
-1. First, run the existing test suite and record the results.
-2. ${task.description}
-3. Run the test suite again after migration.
-4. Report success only if all previously passing tests still pass.
-5. Do not modify areas outside the scope of this task.
+1. Clone the repository and checkout the main branch.
+2. Run the existing build and test suite — record the baseline results.
+   - Build: ng build boa-ui && ng build boa-digital-banking && (cd downstream-consumer && ng build)
+   - Lint: ng lint
+   - Tests: ng test --no-watch --browsers=ChromeHeadless
+3. Perform the migration step: ${task.description}
+4. File paths to focus on: ${task.path}
+5. Run the full build, lint, and test suite again after migration.
+6. Report success only if all previously passing tests still pass and all builds succeed.
+7. Do not modify areas outside the scope of this task.
+8. Create a PR with clear commit messages describing the migration step.
 
-File paths: ${task.path}
+IMPORTANT: This is a sequential migration (14→15→16→17→18). The codebase should currently be at the version BEFORE this phase's target. Only make changes appropriate for upgrading to ${phase.requirements.angular}.
 
-IMPORTANT: This is a sequential migration. The codebase should currently be at the version BEFORE this phase's target. Only make changes appropriate for upgrading to ${phase.requirements.angular}.`;
+Key migration pain points in this codebase:
+- NgModule-heavy architecture (13 modules) → target: standalone components
+- Class-based HttpInterceptors → target: functional interceptors
+- Class-based CanActivate guards → target: functional guards
+- ComponentFactoryResolver in meridian-modal → target: ViewContainerRef.createComponent()
+- Heavy RxJS with manual subscriptions → target: Signals / toSignal()
+- Angular Material 14 → target: MDC-based Material
+- Protractor e2e tests → target: modern test runner
+- entryComponents arrays → target: remove (no-op with Ivy)`;
 
       try {
         const res = await fetch(`${CONFIG.DEVIN_API_BASE}/sessions`, {
@@ -1629,6 +1878,7 @@ IMPORTANT: This is a sequential migration. The codebase should currently be at t
         task.sessionUrl = data.url;
 
         renderPhases();
+        saveState();
         addLog('success', `Devin session started for ${task.name}: ${task.taskId}`);
         showToast(`Devin started: ${task.name}`, 'info');
 
@@ -1638,6 +1888,8 @@ IMPORTANT: This is a sequential migration. The codebase should currently be at t
         task.status = 'Failed';
         renderPhases();
         updateSummary();
+        updateOverallProgress();
+        saveState();
         addLog('error', `Failed to trigger Devin for ${task.name}: ${err.message}`);
         showToast(`Failed: ${task.name} — ${err.message}`, 'error');
       }
@@ -1671,6 +1923,8 @@ IMPORTANT: This is a sequential migration. The codebase should currently be at t
           if (prevStatus !== status) {
             renderPhases();
             updateSummary();
+            updateOverallProgress();
+            saveState();
             addLog(
               status === 'Completed' ? 'success' : status === 'Failed' ? 'error' : 'info',
               `${task.name}: ${prevStatus} → ${status}`
@@ -1728,6 +1982,8 @@ IMPORTANT: This is a sequential migration. The codebase should currently be at t
 
       renderPhases();
       updateSummary();
+      updateOverallProgress();
+      saveState();
       addLog('info', `Refreshed ${refreshed} task(s) in ${phase.name}`);
       showToast(`Refreshed ${refreshed} task(s)`, 'info');
     }
@@ -1798,6 +2054,69 @@ IMPORTANT: This is a sequential migration. The codebase should currently be at t
 
     function clearLog() {
       document.getElementById('logContent').innerHTML = '';
+    }
+
+    // ============================================================
+    // OVERALL PROGRESS BAR
+    // ============================================================
+    function updateOverallProgress() {
+      const container = document.getElementById('progressPhases');
+      const textEl    = document.getElementById('overallProgressText');
+      if (!container || migrationPhases.length === 0) return;
+
+      const totalTasks = migrationPhases.reduce((sum, p) => sum + p.tasks.length, 0);
+      const doneTasks  = migrationPhases.reduce((sum, p) => sum + p.tasks.filter(t => t.status === 'Completed').length, 0);
+      textEl.textContent = `${doneTasks} / ${totalTasks} tasks complete (${Math.round(doneTasks / totalTasks * 100)}%)`;
+
+      container.innerHTML = '';
+      migrationPhases.forEach((phase, i) => {
+        const isLocked     = isPhaseLocked(i);
+        const phaseStatus  = getPhaseStatus(phase, isLocked);
+        const completed    = phase.tasks.filter(t => t.status === 'Completed').length;
+        const total        = phase.tasks.length;
+        const pct          = total > 0 ? Math.round(completed / total * 100) : 0;
+
+        const div = document.createElement('div');
+        div.className = 'progress-phase' +
+          (phaseStatus === 'complete' ? ' phase-done' : '') +
+          (phaseStatus === 'active' || phaseStatus === 'ready' ? ' phase-current' : '');
+
+        let fillClass = 'fill-locked';
+        if (phaseStatus === 'complete') fillClass = 'fill-complete';
+        else if (phaseStatus === 'active' || phaseStatus === 'ready' || phaseStatus === 'failed') fillClass = 'fill-active';
+
+        div.innerHTML = `
+          <div class="progress-phase-bar">
+            <div class="progress-phase-fill ${fillClass}" style="width:${pct}%"></div>
+          </div>
+          <div class="progress-phase-label">${escapeHtml(phase.name)}</div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // ============================================================
+    // RESET STATE (for starting a fresh demo)
+    // ============================================================
+    function resetDashboard() {
+      if (!confirm('Reset all migration progress? This cannot be undone.')) return;
+      clearSavedState();
+      for (const intervalId of Object.values(pollingIntervals)) {
+        clearInterval(intervalId);
+      }
+      pollingIntervals = {};
+      migrationPhases = [];
+      repoIdentifier = '';
+      repoOwner = '';
+      repoName = '';
+      document.getElementById('phasesContainer').classList.remove('active');
+      document.getElementById('phasesContainer').innerHTML = '';
+      document.getElementById('summaryBar').classList.remove('active');
+      document.getElementById('overallProgress').classList.remove('active');
+      document.getElementById('logPanel').classList.remove('active');
+      document.getElementById('emptyState').style.display = '';
+      clearLog();
+      showToast('Dashboard reset — ready for a fresh demo', 'info');
     }
 
     function delay(ms) {
