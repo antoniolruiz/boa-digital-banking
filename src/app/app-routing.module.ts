@@ -1,12 +1,11 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-import { AuthGuard } from './core/auth/auth.guard';
+import { authGuard } from './core/auth/auth.guard';
 
 /**
- * App Routing Module - uses string-based loadChildren syntax (deprecated pattern).
- * This is a key migration target: Angular 15+ requires arrow function imports.
- *
- * Also uses class-based Resolve interface (deprecated in Angular 15+).
+ * App Routing Module — Angular 15 migration step.
+ * Uses functional authGuard (CanActivateFn) instead of class-based AuthGuard.
+ * loadChildren still uses NgModule-based lazy loading (standalone migration planned for later phase).
  */
 const routes: Routes = [
   {
@@ -19,37 +18,37 @@ const routes: Routes = [
     // String-based lazy loading syntax — deprecated migration target
     // Modern: loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule)
     loadChildren: () => import('./features/dashboard/dashboard.module').then(m => m.DashboardModule),
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: { permissions: ['accounts:read'] }
   },
   {
     path: 'accounts',
     loadChildren: () => import('./features/accounts/accounts.module').then(m => m.AccountsModule),
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: { permissions: ['accounts:read'] }
   },
   {
     path: 'transfers',
     loadChildren: () => import('./features/transfers/transfers.module').then(m => m.TransfersModule),
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: { permissions: ['transfers:initiate'] }
   },
   {
     path: 'bill-pay',
     loadChildren: () => import('./features/bill-pay/bill-pay.module').then(m => m.BillPayModule),
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: { permissions: ['billpay:read'] }
   },
   {
     path: 'alerts',
     loadChildren: () => import('./features/alerts/alerts.module').then(m => m.AlertsModule),
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: { permissions: ['alerts:read'] }
   },
   {
     path: 'profile',
     loadChildren: () => import('./features/profile/profile.module').then(m => m.ProfileModule),
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     data: { permissions: ['profile:read'] }
   },
   {

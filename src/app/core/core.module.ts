@@ -13,7 +13,6 @@ import { ReactiveFormsModule } from '@angular/forms';
 
 // Auth
 import { SsoAuthService } from './auth/sso-auth.service';
-import { AuthGuard } from './auth/auth.guard';
 import { AuthInterceptor } from './auth/auth.interceptor';
 import { MfaChallengeComponent } from './auth/mfa-challenge.component';
 import { SessionTimeoutService } from './auth/session-timeout.service';
@@ -106,7 +105,6 @@ export class CoreModule {
       ngModule: CoreModule,
       providers: [
         SsoAuthService,
-        AuthGuard,
         SessionTimeoutService,
         EricaAnalyticsService,
       ]

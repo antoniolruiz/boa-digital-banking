@@ -1,52 +1,46 @@
-import { Injectable } from '@angular/core';
-import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot, Router, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
+import { inject } from '@angular/core';
+import { CanActivateFn, Router } from '@angular/router';
 import { map, take } from 'rxjs/operators';
 import { SsoAuthService } from './sso-auth.service';
 
 /**
- * Route guard implementing the deprecated CanActivate interface.
- * This is a key migration target: Angular 15+ deprecates class-based guards
- * in favor of functional guards using inject().
+ * Functional route guard using Angular 15 CanActivateFn.
+ * Replaces the deprecated class-based AuthGuard (CanActivate interface).
  *
- * Migration: Convert to `canActivate: [() => inject(SsoAuthService).isAuthenticated$]`
+ * Uses inject() to obtain dependencies instead of constructor injection.
  */
-@Injectable({
-  providedIn: 'root'
-})
-export class AuthGuard implements CanActivate {
+export const authGuard: CanActivateFn = (route, state) => {
+  const authService = inject(SsoAuthService);
+  const router = inject(Router);
 
-  constructor(
-    private authService: SsoAuthService,
-    private router: Router
-  ) {}
-
-  canActivate(
-    route: ActivatedRouteSnapshot,
-    state: RouterStateSnapshot
-  ): Observable<boolean | UrlTree> {
-    return this.authService.isAuthenticated$.pipe(
-      take(1),
-      map(isAuthenticated => {
-        if (isAuthenticated) {
-          // Check for required permissions if specified in route data
-          const requiredPermissions = route.data['permissions'] as string[] | undefined;
-          if (requiredPermissions && requiredPermissions.length > 0) {
-            const hasPermission = this.authService.hasAnyPermission(requiredPermissions);
-            if (!hasPermission) {
-              return this.router.createUrlTree(['/error'], {
-                queryParams: { code: '403', message: 'Insufficient permissions' }
-              });
-            }
+  return authService.isAuthenticated$.pipe(
+    take(1),
+    map(isAuthenticated => {
+      if (isAuthenticated) {
+        // Check for required permissions if specified in route data
+        const requiredPermissions = route.data['permissions'] as string[] | undefined;
+        if (requiredPermissions && requiredPermissions.length > 0) {
+          const hasPermission = authService.hasAnyPermission(requiredPermissions);
+          if (!hasPermission) {
+            return router.createUrlTree(['/error'], {
+              queryParams: { code: '403', message: 'Insufficient permissions' }
+            });
           }
-          return true;
         }
+        return true;
+      }
 
-        // Store the attempted URL for redirecting after login
-        return this.router.createUrlTree(['/login'], {
-          queryParams: { returnUrl: state.url }
-        });
-      })
-    );
-  }
-}
+      // Store the attempted URL for redirecting after login
+      return router.createUrlTree(['/login'], {
+        queryParams: { returnUrl: state.url }
+      });
+    })
+  );
+};
+
+/**
+ * @deprecated Use the functional `authGuard` instead.
+ * Class-based guards are deprecated in Angular 15+ in favor of functional guards.
+ * Kept for backward compatibility during the migration period.
+ */
+export { authGuard as AuthGuard };

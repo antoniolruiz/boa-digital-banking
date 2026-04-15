@@ -1,14 +1,14 @@
 import { TestBed } from '@angular/core/testing';
-import { Router, UrlTree } from '@angular/router';
+import { Router, UrlTree, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
-import { BehaviorSubject } from 'rxjs';
-import { AuthGuard } from './auth.guard';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { authGuard } from './auth.guard';
 import { SsoAuthService } from './sso-auth.service';
 
-describe('AuthGuard', () => {
-  let guard: AuthGuard;
+describe('authGuard', () => {
   let isAuthenticated$: BehaviorSubject<boolean>;
   let mockAuthService: Partial<SsoAuthService>;
+  let router: Router;
 
   beforeEach(() => {
     isAuthenticated$ = new BehaviorSubject<boolean>(false);
@@ -20,24 +20,23 @@ describe('AuthGuard', () => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule.withRoutes([])],
       providers: [
-        AuthGuard,
         { provide: SsoAuthService, useValue: mockAuthService }
       ]
     });
 
-    guard = TestBed.inject(AuthGuard);
+    router = TestBed.inject(Router);
   });
 
-  it('should be created', () => {
-    expect(guard).toBeTruthy();
-  });
+  function runGuard(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean | UrlTree> {
+    return TestBed.runInInjectionContext(() => authGuard(route, state)) as Observable<boolean | UrlTree>;
+  }
 
   it('should redirect to login when not authenticated', (done) => {
     isAuthenticated$.next(false);
-    const mockRoute = { data: {} } as any;
-    const mockState = { url: '/dashboard' } as any;
+    const mockRoute = { data: {} } as unknown as ActivatedRouteSnapshot;
+    const mockState = { url: '/dashboard' } as RouterStateSnapshot;
 
-    guard.canActivate(mockRoute, mockState).subscribe(result => {
+    runGuard(mockRoute, mockState).subscribe(result => {
       expect(result instanceof UrlTree).toBeTrue();
       done();
     });
@@ -45,10 +44,10 @@ describe('AuthGuard', () => {
 
   it('should allow access when authenticated', (done) => {
     isAuthenticated$.next(true);
-    const mockRoute = { data: {} } as any;
-    const mockState = { url: '/dashboard' } as any;
+    const mockRoute = { data: {} } as unknown as ActivatedRouteSnapshot;
+    const mockState = { url: '/dashboard' } as RouterStateSnapshot;
 
-    guard.canActivate(mockRoute, mockState).subscribe(result => {
+    runGuard(mockRoute, mockState).subscribe(result => {
       expect(result).toBeTrue();
       done();
     });
@@ -58,10 +57,10 @@ describe('AuthGuard', () => {
     isAuthenticated$.next(true);
     (mockAuthService.hasAnyPermission as jasmine.Spy).and.returnValue(false);
 
-    const mockRoute = { data: { permissions: ['admin.manage'] } } as any;
-    const mockState = { url: '/admin' } as any;
+    const mockRoute = { data: { permissions: ['admin.manage'] } } as unknown as ActivatedRouteSnapshot;
+    const mockState = { url: '/admin' } as RouterStateSnapshot;
 
-    guard.canActivate(mockRoute, mockState).subscribe(result => {
+    runGuard(mockRoute, mockState).subscribe(result => {
       // Should return UrlTree redirect to /error for insufficient permissions
       expect(result instanceof UrlTree).toBeTrue();
       done();
@@ -72,10 +71,10 @@ describe('AuthGuard', () => {
     isAuthenticated$.next(true);
     (mockAuthService.hasAnyPermission as jasmine.Spy).and.returnValue(false);
 
-    const mockRoute = { data: { permissions: ['nonexistent.permission'] } } as any;
-    const mockState = { url: '/restricted' } as any;
+    const mockRoute = { data: { permissions: ['nonexistent.permission'] } } as unknown as ActivatedRouteSnapshot;
+    const mockState = { url: '/restricted' } as RouterStateSnapshot;
 
-    guard.canActivate(mockRoute, mockState).subscribe(result => {
+    runGuard(mockRoute, mockState).subscribe(result => {
       expect(result).not.toBeTrue();
       done();
     });
