@@ -17,15 +17,16 @@ window.MIGRATION_CONFIG = {
   // Your Devin API bearer token (Devin service token).
   // For Devin sessions: use the $SERVICE_ANTONIO secret.
   // Generate at: https://app.devin.ai/settings/api-tokens
-  DEVIN_API_TOKEN: '',
+  DEVIN_API_TOKEN: 'YOUR_DEVIN_API_TOKEN_HERE',
 
   // GitHub personal access token (for repository scanning).
   // For Devin sessions: use the $GITHUB_TOKEN secret.
   // Needs 'repo' scope for private repos, or 'public_repo' for public repos.
   // Generate at: https://github.com/settings/tokens
-  GITHUB_TOKEN: '',
+  GITHUB_TOKEN: 'YOUR_GITHUB_TOKEN_HERE',
 
-  // Devin API base URL (v1). Change only if using a proxy.
-  DEVIN_API_BASE: 'https://api.devin.ai/v1'
+  // Local CORS proxy (run: node migration-dashboard/proxy.js)
+  // Change to 'https://api.devin.ai/v1' if not using the proxy.
+  DEVIN_API_BASE: 'http://localhost:4203'
 
 };
