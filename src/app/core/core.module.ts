@@ -4,11 +4,11 @@ import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 import { RouterModule } from '@angular/router';
 
 // Angular Material 14 imports for core components
-import { MatButtonModule } from '@angular/material/button';
+import { MatLegacyButtonModule as MatButtonModule } from '@angular/material/legacy-button';
 import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatLegacyFormFieldModule as MatFormFieldModule } from '@angular/material/legacy-form-field';
+import { MatLegacyInputModule as MatInputModule } from '@angular/material/legacy-input';
+import { MatLegacyProgressSpinnerModule as MatProgressSpinnerModule } from '@angular/material/legacy-progress-spinner';
 import { ReactiveFormsModule } from '@angular/forms';
 
 // Auth
@@ -58,12 +58,7 @@ import { ErrorPageComponent } from './error-handling/error-page.component';
     ErrorPageComponent,
     PageTrackingDirective,
   ],
-  // entryComponents is a ViewEngine-era artifact.
-  // It's a no-op with Ivy but present in many Angular 14 codebases.
-  entryComponents: [
-    MfaChallengeComponent,
-    ErrorPageComponent,
-  ],
+  // entryComponents removed in Angular 15 (was a ViewEngine-era artifact, no-op with Ivy)
   providers: [
     // Class-based HTTP interceptors - migration target for Angular 15+
     {
