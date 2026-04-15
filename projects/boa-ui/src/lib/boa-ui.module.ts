@@ -49,7 +49,6 @@ import { MeridianA11yService } from './services/meridian-a11y.service';
  * When migrating to Material 15+, these become MatLegacyXxxModule (legacy prefix)
  * as the MDC-based components take over the non-prefixed names.
  *
- * entryComponents is a ViewEngine-era artifact (no-op with Ivy but present in legacy).
  */
 @NgModule({
   declarations: [
@@ -111,17 +110,6 @@ import { MeridianA11yService } from './services/meridian-a11y.service';
     MatSortModule,
     MatBadgeModule,
     MatDividerModule,
-  ],
-  // entryComponents is a ViewEngine-era artifact
-  entryComponents: [
-    MeridianButtonComponent,
-    MeridianCardComponent,
-    MeridianDataTableComponent,
-    MeridianFormFieldComponent,
-    MeridianAlertBannerComponent,
-    MeridianNavShellComponent,
-    MeridianAccountSummaryComponent,
-    MeridianSecureBadgeComponent,
   ],
   providers: [
     MeridianModalService,
