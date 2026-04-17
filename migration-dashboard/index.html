@@ -1814,7 +1814,7 @@
       saveState();
       addLog('info', `Triggering Devin for: ${task.name} (${phase.name})`);
 
-      const prompt = `You are an Angular migration expert. Perform the following migration step on the boa-digital-banking Angular codebase. Make sure that if the task is long that you create sessions to tackle the task in batches, don't do a single session unless the task is very simple.
+      const prompt = `You are an Angular migration expert. Perform the following migration step on the boa-digital-banking Angular codebase. Make sure to create at least a couple sessions to tackle the task in batches, don't do a single session unless the task is very simple and the amount of changes is very low.
 
 Repository: ${repoIdentifier}
 Migration Phase: ${phase.name} (Phase ${migrationPhases.indexOf(phase) + 1} of ${migrationPhases.length})
