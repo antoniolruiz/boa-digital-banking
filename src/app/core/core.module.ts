@@ -34,7 +34,6 @@ import { ErrorPageComponent } from './error-handling/error-page.component';
  * This is a classic Angular 14 pattern:
  * - HttpClientModule imported here (deprecated in Angular 18, use provideHttpClient())
  * - HTTP_INTERCEPTORS multi-provider for class-based interceptors
- * - entryComponents array (ViewEngine artifact, no-op with Ivy but present in legacy code)
  */
 @NgModule({
   declarations: [
@@ -57,12 +56,6 @@ import { ErrorPageComponent } from './error-handling/error-page.component';
     MfaChallengeComponent,
     ErrorPageComponent,
     PageTrackingDirective,
-  ],
-  // entryComponents is a ViewEngine-era artifact.
-  // It's a no-op with Ivy but present in many Angular 14 codebases.
-  entryComponents: [
-    MfaChallengeComponent,
-    ErrorPageComponent,
   ],
   providers: [
     // Class-based HTTP interceptors - migration target for Angular 15+
